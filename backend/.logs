@@ -1,0 +1,30 @@
+2025/11/27 18:38:49 Running in interactive mode.
+2025/11/27 18:38:58 Initializing project github.com/Edwin9301/Zen
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/Dockerfile
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/.envs
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/.envs/.local
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/.envs/.local/config.env
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/.envs/configs
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/.envs/configs/sqlc.yaml
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/cmd
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/cmd/cli
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/cmd/cli/main.go
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/cmd/server
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/cmd/server/main.go
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/internal
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/mock
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/services
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/internal/postgres
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/postgres/queries
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/postgres/mock
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/postgres/generated
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/postgres/migrations
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/handlers
+2025/11/27 18:38:58 Creating empty directory: /home/emilio-cliff/Zen/backend/internal/repository
+2025/11/27 18:38:58 Creating directory: /home/emilio-cliff/Zen/backend/pkg
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/pkg/errors.go
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/README.md
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/.gitignore
+2025/11/27 18:38:58 Creating file: /home/emilio-cliff/Zen/backend/Makefile
+2025/11/27 18:38:58 Initializing go module...
+2025/11/27 18:38:58 Initializing git repository...
