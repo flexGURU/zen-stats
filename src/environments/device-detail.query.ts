@@ -12,11 +12,5 @@ export const deviceDetailQuery = (deviceId: Signal<string | number>) => {
     staleTime: 1000 * 60 * 1,
   }));
 
-  const deviceInfoQuery = injectQuery(() => ({
-    queryKey: ['deviceInfo', deviceId()],
-    queryFn: () => lastValueFrom(deviceDetailService.getDeviceId(deviceId())),
-    staleTime: 1000 * 60 * 5,
-  }));
-
-  return { deviceDataQuery, deviceInfoQuery };
+  return deviceDataQuery;
 };
