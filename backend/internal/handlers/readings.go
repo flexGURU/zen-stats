@@ -55,14 +55,14 @@ func (s *Server) getSensorReadingByIDHandler(ctx *gin.Context) {
 func (s *Server) listSensorReadingsHandler(ctx *gin.Context) {
 	listBy := ctx.DefaultQuery("list_by", "date")
 
+	deviceId, err := pkg.StrToUint32(ctx.Query("device_id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, "device_id query parameter is required for timeslot-based listing")))
+		return
+	}
+
 	switch listBy {
 	case "device":
-		deviceId, err := pkg.StrToUint32(ctx.Query("device_id"))
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, "device_id query parameter is required for date-based listing")))
-			return
-		}
-
 		pageNoStr := ctx.DefaultQuery("page", "1")
 		pageNo, err := pkg.StrToInt64(pageNoStr)
 		if err != nil {
@@ -116,12 +116,6 @@ func (s *Server) listSensorReadingsHandler(ctx *gin.Context) {
 			return
 		}
 
-		deviceId, err := pkg.StrToUint32(ctx.Query("device_id"))
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, "device_id query parameter is required for timeslot-based listing")))
-			return
-		}
-
 		filter := &repository.ReadingFilter{
 			DeviceID: deviceId,
 			Start:    &startTime,
@@ -138,12 +132,6 @@ func (s *Server) listSensorReadingsHandler(ctx *gin.Context) {
 
 		return
 	default:
-		deviceId, err := pkg.StrToUint32(ctx.Query("device_id"))
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, "device_id query parameter is required for timeslot-based listing")))
-			return
-		}
-
 		dateStr := ctx.Query("date")
 		date := time.Now()
 

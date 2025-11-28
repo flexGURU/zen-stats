@@ -29,14 +29,14 @@ type Reading struct {
 }
 
 type ReadingPayload struct {
-	CO2      *float64 `json:"co2_ppm"`
-	Humidity *float64 `json:"humidity_pct"`
-	TempC    *float64 `json:"temperature_c"`
+	CO2      *float64 `json:"co2"`
+	Pressure *float64 `json:"pressure"`
+	Temp     *float64 `json:"temperature"`
 	ServerTS string   `json:"server_timestamp" binding:"required"`
 }
 
 func (rp *ReadingPayload) Validate() error {
-	if rp.CO2 == nil && rp.Humidity == nil && rp.TempC == nil {
+	if rp.CO2 == nil && rp.Pressure == nil && rp.Temp == nil {
 		return pkg.Errorf(pkg.INVALID_ERROR, "at least one sensor reading must be provided")
 	}
 	return nil
