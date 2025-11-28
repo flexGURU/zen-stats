@@ -1,14 +1,50 @@
-<p-card [style]="{ width: '25rem', overflow: 'hidden', cursor: 'pointer' }">
-  <ng-template #header> </ng-template>
-  <ng-template #title> sensor1</ng-template>
-  <ng-template #subtitle>
-    status:
-    <span class="border border-green-500 text-green-500 rounded-lg text-sm p-1"
-      >active</span
-    >
+<p-card
+  class="cursor-pointer shadow-md hover:shadow-xl transition-all duration-300 rounded-2xl overflow-hidden border border-gray-100"
+>
+  <ng-template #header>
+    <div class="bg-gray-50 text-center py-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-800">
+        {{ device()?.name }}
+      </h3>
+    </div>
   </ng-template>
 
+  <div class="p-4 space-y-3">
+    <div class="flex justify-between items-center">
+      <span class="text-gray-600 font-medium">Status</span>
+
+      <span
+        class="text-sm px-3 py-1 rounded-lg border"
+        [ngClass]="{
+          'border-green-500 text-green-600 bg-green-50': device()?.status,
+          'border-red-500 text-red-600 bg-red-50': !device()?.status
+        }"
+      >
+        {{ device()?.status ? "Active" : "Inactive" }}
+      </span>
+    </div>
+
+    <div class="text-gray-500 text-sm">
+      Last updated:
+      <span class="text-gray-700 font-medium">
+        {{ device()?.created_at | date : "medium" }}
+      </span>
+    </div>
+  </div>
+
   <ng-template #footer>
-    <div class="flex gap-4 mt-1"></div>
+    <div class="flex gap-2 border-t border-gray-200 p-3">
+      <button
+        pButton
+        label="Details"
+        class="p-button-sm p-button-outlined w-full"
+      ></button>
+
+      <button
+        pButton
+        label="Manage"
+        class="p-button-sm p-button-primary w-full"
+      ></button>
+    </div>
   </ng-template>
 </p-card>

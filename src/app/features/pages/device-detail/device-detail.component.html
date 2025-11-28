@@ -1,46 +1,75 @@
 <div class="min-h-screen bg-gray-50 p-4 md:p-6">
   <div class="w-11/12 mx-auto">
-    @if (deviceData.isLoading()) {
-    <div class="flex flex-col justify-center items-center">
-      <p-progress-spinner
-        strokeWidth="4"
-        fill="transparent"
-        animationDuration=".5s"
-        ariaLabel="Loading Zen Stats"
-      />
-      <span>Loading Zen Stats</span>
-    </div>
-    } @else if (deviceData.isError()) {
-    <div class="flex flex-col justify-center items-center">
-      <p-message severity="error"
-        >Error loading Zen Stats. Please try again.
-        <p-button
-          size="small"
-          icon="pi pi-refresh"
-          label="Reload"
-          severity="danger"
-          (onClick)="deviceData.refetch()"
-        ></p-button
-      ></p-message>
-    </div>
+    <div class="my-2 w-1/4 rounded-xl shadow-sm border border-gray-100">
+      <p-breadcrumb [model]="breadCrumbItem()" [home]="home">
+        <ng-template #separator> / </ng-template>
+      </p-breadcrumb>
+      <p-message severity="success">
+        <h3 class="text-xl">As On</h3>
 
-    }@else if (!deviceData.data()?.length) {
-    <app-empty-state (reload)="deviceData.refetch()" />
+        @let timestamp = deviceData.data()?.[0]?.payload?.server_timestamp;
 
-    } @else if(deviceData.data()?.length) {
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="lg:col-span-1 space-y-6">
+        <span>
+          {{
+            timestamp ? (timestamp | date : "mediumDate") : "No data available"
+          }}
+        </span>
+      </p-message>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-4 xl:col-span-3 space-y-6">
+        @if (deviceData.isLoading()) {
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div class="flex flex-col justify-center items-center py-8">
+            <p-progress-spinner
+              strokeWidth="4"
+              fill="transparent"
+              animationDuration=".5s"
+              ariaLabel="Loading Zen Stats"
+            />
+            <span class="mt-4 text-gray-600 text-sm">Loading Zen Stats</span>
+          </div>
+        </div>
+        } @else if (deviceData.isError()) {
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div class="flex flex-col justify-center items-center py-8">
+            <p-message severity="error" class="mb-4">
+              Error loading data
+            </p-message>
+            <p-button
+              size="small"
+              icon="pi pi-refresh"
+              label="Reload"
+              severity="danger"
+              (onClick)="deviceData.refetch()"
+            ></p-button>
+          </div>
+        </div>
+        } @else if (!deviceData.data()?.length) {
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <app-empty-state (reload)="deviceData.refetch()" />
+        </div>
+        } @else {
+
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
         >
-          <app-sensor-value />
+          <app-sensor-value
+            [sensorData]="
+              deviceData.data() && deviceData.data()?.length
+                ? deviceData.data()?.[0]
+                : undefined
+            "
+          />
         </div>
 
         <div
-          class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 space-y-5"
+          class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 space-y-5"
         >
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
+
           <div class="flex flex-col space-y-2">
-            <span class="text-gray-700 font-medium">Date </span>
+            <label class="text-gray-700 font-medium text-sm">Date</label>
             <p-datepicker
               [(ngModel)]="selectedDate"
               [showClear]="true"
@@ -51,38 +80,89 @@
 
           <p-divider type="dashed" />
 
-          <div class="space-y-2">
-            <span class="text-gray-700 font-medium">Time Range</span>
+          <div class="space-y-3">
+            <label class="text-gray-700 font-medium text-sm block"
+              >Time Range</label
+            >
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <p-datepicker
-                [(ngModel)]="startTime"
-                [timeOnly]="true"
-                placeholder="Start Time"
-                class="w-full"
-                size="small"
-              ></p-datepicker>
+            <div class="flex flex-col gap-3">
+              <div class="flex flex-col space-y-1">
+                <span class="text-xs text-gray-500">Start Time</span>
+                <p-datepicker
+                  [(ngModel)]="startTime"
+                  [timeOnly]="true"
+                  placeholder="Start Time"
+                  class="w-full"
+                  size="small"
+                ></p-datepicker>
+              </div>
 
-              <p-datepicker
-                [(ngModel)]="endTime"
-                [timeOnly]="true"
-                placeholder="End Time"
-                class="w-full"
-                size="small"
-              ></p-datepicker>
+              <div class="flex flex-col space-y-1">
+                <span class="text-xs text-gray-500">End Time</span>
+                <p-datepicker
+                  [(ngModel)]="endTime"
+                  [timeOnly]="true"
+                  placeholder="End Time"
+                  class="w-full"
+                  size="small"
+                ></p-datepicker>
+              </div>
             </div>
           </div>
+
+          <div class="pt-2">
+            <p-button
+              label="Apply Filters"
+              icon="pi pi-filter"
+              size="small"
+              class="w-full"
+              [outlined]="true"
+            ></p-button>
+          </div>
         </div>
+
+        }
       </div>
 
-      <div class="lg:col-span-2">
+      <div class="lg:col-span-8 xl:col-span-9">
         <div
-          class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
+          class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 min-h-[500px] relative"
         >
           <canvas id="deviceChart"></canvas>
+
+          @if (deviceData.isLoading()) {
+          <div
+            class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl"
+          >
+            <div class="text-center">
+              <p-progress-spinner
+                strokeWidth="4"
+                fill="transparent"
+                animationDuration=".5s"
+              />
+              <p class="mt-4 text-gray-600">Loading chart data...</p>
+            </div>
+          </div>
+          } @else if (deviceData.isError()) {
+          <div
+            class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl"
+          >
+            <div class="text-center">
+              <p-message severity="error">Failed to load chart data</p-message>
+            </div>
+          </div>
+          } @else if (!deviceData.data()?.length) {
+          <div
+            class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl"
+          >
+            <div class="text-center text-gray-500">
+              <i class="pi pi-chart-line text-4xl mb-4 block"></i>
+              <p>No data available for visualization</p>
+            </div>
+          </div>
+          }
         </div>
       </div>
     </div>
-    }
   </div>
 </div>

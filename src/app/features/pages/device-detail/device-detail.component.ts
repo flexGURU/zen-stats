@@ -1,4 +1,4 @@
-import { Component, effect, input, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, input, signal } from '@angular/core';
 import chart, { Chart } from 'chart.js/auto';
 import { SensorValueComponent } from '../../components/sensor-value/sensor-value.component';
 import { SelectModule } from 'primeng/select';
@@ -13,6 +13,7 @@ import { Button } from 'primeng/button';
 import { EmptyStateComponent } from '../../components/empty-state/empty-state.component';
 import { DatePicker } from 'primeng/datepicker';
 import { DividerModule } from 'primeng/divider';
+import { Breadcrumb } from 'primeng/breadcrumb';
 
 @Component({
   selector: 'app-device-detail',
@@ -28,31 +29,27 @@ import { DividerModule } from 'primeng/divider';
     DatePicker,
     EmptyStateComponent,
     DividerModule,
+    Breadcrumb,
   ],
   templateUrl: './device-detail.component.html',
   styles: ``,
 })
 export class DeviceDetailComponent {
-  deviceId = input.required<string>();
+  deviceId = input.required<string | number>();
   chart!: Chart;
   ingredient: string = 'Cheese';
   selectedFrequencyOption = signal('');
-  deviceData = deviceDetailQuery(this.deviceId);
+  deviceData = deviceDetailQuery(this.deviceId).deviceDataQuery;
+  deviceInfo = deviceDetailQuery(this.deviceId).deviceInfoQuery;
   selectedDate = signal<Date[]>([]);
   startTime = signal<Date | null>(null);
   endTime = signal<Date | null>(null);
+  items = [{ label: '' }];
+  home = { icon: 'pi pi-home', url: '/' };
 
   constructor() {
     effect(() => {
-      this.deviceData.data()
-        ? this.transformDataForChart()
-        : console.log('No data yet');
-    });
-
-    effect(() => {
-      console.log('Selected Date:', this.selectedDate());
-      console.log('Start Time:', this.startTime());
-      console.log('End Time:', this.endTime());
+      this.deviceData.data() ? this.transformDataForChart() : null;
     });
   }
 
@@ -60,21 +57,26 @@ export class DeviceDetailComponent {
     this.initChart();
   }
 
+  breadCrumbItem = computed(() => {
+    const deviceName = this.deviceInfo.data()?.name || 'Device';
+    return [{ label: `${deviceName}` }];
+  });
+
   transformDataForChart() {
     const data = this.deviceData.data();
     const labels = data?.map((entry) => {
-      return new Date(entry.server_timestamp).toLocaleString();
+      return new Date(entry.payload.server_timestamp).toLocaleString();
     });
 
     if (data && labels) {
-      const tempValues = data.map((entry) => entry.temperature_c);
-      const co2Values = data.map((entry) => entry.co2_ppm);
-      const humidityValues = data?.map((entry) => entry.humidity_pct);
+      const tempValues = data.map((entry) => entry.payload.temperature);
+      const co2Values = data.map((entry) => entry.payload.co2);
+      const pressureValues = data?.map((entry) => entry.payload.pressure);
 
       const chartData: ChartUpdateData = {
         tempValues,
         co2Values,
-        humidityValues,
+        pressureValues,
         labels,
       };
       this.updateChart(chartData);
@@ -82,10 +84,10 @@ export class DeviceDetailComponent {
   }
 
   updateChart = (chartData: ChartUpdateData) => {
-    const { labels, co2Values, humidityValues, tempValues } = chartData;
+    const { labels, co2Values, pressureValues, tempValues } = chartData;
     this.chart.data.labels = labels;
     this.chart.data.datasets[0].data = co2Values;
-    this.chart.data.datasets[1].data = humidityValues;
+    this.chart.data.datasets[1].data = pressureValues;
     this.chart.data.datasets[2].data = tempValues;
     this.chart.update();
   };
