@@ -29,7 +29,6 @@ type Reading struct {
 }
 
 type ReadingPayload struct {
-	DeviceID uint32   `json:"deviceId" binding:"required"`
 	CO2      *float64 `json:"co2_ppm"`
 	Humidity *float64 `json:"humidity_pct"`
 	TempC    *float64 `json:"temperature_c"`

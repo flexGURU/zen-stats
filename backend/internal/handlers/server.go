@@ -63,7 +63,7 @@ func (s *Server) setUpRoutes() {
 	v1.GET("/devices/stats", s.getDeviceStatsHandler)
 
 	// sensor readings routes
-	v1.POST("/readings", s.createSensorReadingHandler)
+	v1.POST("/readings/:id", s.createSensorReadingHandler)
 	v1.GET("/readings/:id", s.getSensorReadingByIDHandler)
 	v1.GET("/readings", s.listSensorReadingsHandler)
 

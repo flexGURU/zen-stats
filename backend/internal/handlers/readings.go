@@ -15,8 +15,14 @@ func (s *Server) createSensorReadingHandler(ctx *gin.Context) {
 		return
 	}
 
+	id, err := pkg.StrToUint32(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, "invalid reading ID")))
+		return
+	}
+
 	reading := &repository.Reading{
-		DeviceID: req.DeviceID,
+		DeviceID: id,
 		Payload:  req,
 	}
 
