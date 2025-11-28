@@ -29,7 +29,6 @@
 
     } @else if(deviceData.data()?.length) {
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div class="card flex justify-center"></div>
       <div class="lg:col-span-1 space-y-6">
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
@@ -37,23 +36,41 @@
           <app-sensor-value />
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">
-            Frequency Setter
-          </h3>
-          @for (option of frequencyOptions; track $index) {
-          <div class="flex items-center">
-            <p-radiobutton
-              name="pizza"
-              [(ngModel)]="selectedFrequencyOption"
-              [value]="option"
-              inputId="ingredient1"
-            />
-            <label for="ingredient1" class="ml-2">{{ option }}</label>
+        <div
+          class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 space-y-5"
+        >
+          <div class="space-y-2">
+            <span class="text-gray-700 font-medium">Date Range</span>
+            <p-datepicker
+              [(ngModel)]="rangeDates"
+              selectionMode="range"
+              [readonlyInput]="true"
+              showIcon="true"
+              class="w-full"
+            ></p-datepicker>
           </div>
-          }
-          {{ selectedFrequencyOption() }}
-          <p-select [options]="" class="w-1/2" />
+
+          <p-divider />
+
+          <div class="space-y-2">
+            <span class="text-gray-700 font-medium">Time Range</span>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <p-datepicker
+                [(ngModel)]="startTime"
+                [timeOnly]="true"
+                placeholder="Start Time"
+                class="w-full"
+              ></p-datepicker>
+
+              <p-datepicker
+                [(ngModel)]="endTime"
+                [timeOnly]="true"
+                placeholder="End Time"
+                class="w-full"
+              ></p-datepicker>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -66,5 +83,61 @@
       </div>
     </div>
     }
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-1 space-y-6">
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
+        >
+          <app-sensor-value />
+        </div>
+
+        <div
+          class="flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 space-y-5"
+        >
+          <div class="space-y-2">
+            <span class="text-gray-700 font-medium">Date Range</span>
+            <p-datepicker
+              [(ngModel)]="rangeDates"
+              selectionMode="range"
+              [readonlyInput]="true"
+              showIcon="true"
+              class="w-full"
+            ></p-datepicker>
+          </div>
+
+          <p-divider />
+
+          <div class="space-y-2">
+            <span class="text-gray-700 font-medium">Time Range</span>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <p-datepicker
+                [(ngModel)]="startTime"
+                [timeOnly]="true"
+                placeholder="Start Time"
+                class="w-full"
+                size="small"
+              ></p-datepicker>
+
+              <p-datepicker
+                [(ngModel)]="endTime"
+                [timeOnly]="true"
+                placeholder="End Time"
+                class="w-full"
+                size="small"
+              ></p-datepicker>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2">
+        <div
+          class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
+        >
+          <canvas id="deviceChart"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

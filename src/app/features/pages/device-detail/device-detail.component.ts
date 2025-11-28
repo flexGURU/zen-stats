@@ -11,6 +11,8 @@ import { ProgressSpinner } from 'primeng/progressspinner';
 import { Message } from 'primeng/message';
 import { Button } from 'primeng/button';
 import { EmptyStateComponent } from '../../components/empty-state/empty-state.component';
+import { DatePicker } from 'primeng/datepicker';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-device-detail',
@@ -23,7 +25,9 @@ import { EmptyStateComponent } from '../../components/empty-state/empty-state.co
     ProgressSpinner,
     Message,
     Button,
+    DatePicker,
     EmptyStateComponent,
+    DividerModule,
   ],
   templateUrl: './device-detail.component.html',
   styles: ``,
@@ -34,13 +38,21 @@ export class DeviceDetailComponent {
   ingredient: string = 'Cheese';
   selectedFrequencyOption = signal('');
   deviceData = deviceDetailQuery(this.deviceId);
+  rangeDates = signal<Date[]>([]);
+  startTime = signal<Date | null>(null);
+  endTime = signal<Date | null>(null);
 
-  frequencyOptions = ['day', 'week', 'month', 'year'];
   constructor() {
     effect(() => {
       this.deviceData.data()
         ? this.transformDataForChart()
         : console.log('No data yet');
+    });
+
+    effect(() => {
+      console.log('Range Dates:', this.rangeDates());
+      console.log('Start Time:', this.startTime());
+      console.log('End Time:', this.endTime());
     });
   }
 

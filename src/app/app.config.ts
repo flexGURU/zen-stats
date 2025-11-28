@@ -10,6 +10,7 @@ import {
 
 import { routes } from './app.routes';
 import { provideHttpClient, withFetch } from '@angular/common/http';
+import EmeraldGreenPreset from './app.preset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,7 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: Material,
+        preset: EmeraldGreenPreset,
         options: {
           darkModeSelector: '.my-app-dark',
         },
