@@ -133,8 +133,29 @@ func (s *Server) listSensorReadingsHandler(ctx *gin.Context) {
 		return
 	default:
 		dateStr := ctx.Query("date")
-		date := time.Now()
 
+		if dateStr == "" {
+			start := time.Now().Add(-30 * time.Minute)
+			end := time.Now()
+
+			filter := &repository.ReadingFilter{
+				DeviceID: deviceId,
+				Start:    &start,
+				End:      &end,
+			}
+
+			readings, err := s.repo.DeviceRepository.ListReadingByTimeRange(ctx, filter)
+			if err != nil {
+				ctx.JSON(pkg.ErrorToStatusCode(err), errorResponse(err))
+				return
+			}
+
+			ctx.JSON(http.StatusOK, gin.H{"data": readings})
+
+			return
+		}
+
+		date := time.Now()
 		if dateStr != "" {
 			date, err = pkg.StrToDate(dateStr)
 			if err != nil {
