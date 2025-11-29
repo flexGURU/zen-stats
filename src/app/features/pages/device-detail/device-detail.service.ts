@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { catchError, Observable, map } from 'rxjs';
 import {
@@ -16,10 +16,27 @@ export class DeviceDetailService {
 
   private http = inject(HttpClient);
 
+  date = signal('');
+  startTime = signal('');
+  endTime = signal('');
+  list_by = signal('');
+
+  baseApiUrl = computed(() => {
+    const params = new URLSearchParams();
+
+    if (this.date()) params.set('list_by', 'timeslot');
+
+    if (this.date()) params.set('date', this.date().toString());
+    if (this.startTime()) params.set('start', this.startTime().toString());
+    if (this.endTime()) params.set('end', this.endTime().toString());
+
+    return `${this.apiUrl}/readings?${params.toString()}`;
+  });
+
   getDeviceData = (deviceId: string | number): Observable<DeviceSummary[]> => {
     return this.http
       .get<{ data: DeviceSummary[] }>(
-        `${this.apiUrl}/readings?device_id=${deviceId}`
+        `${this.baseApiUrl()}&device_id=${deviceId}`
       )
       .pipe(
         map((response) => response.data),
