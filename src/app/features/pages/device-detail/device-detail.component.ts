@@ -1,4 +1,11 @@
-import { Component, computed, effect, input, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+} from '@angular/core';
 import chart, { Chart } from 'chart.js/auto';
 import { SensorValueComponent } from '../../components/sensor-value/sensor-value.component';
 import { SelectModule } from 'primeng/select';
@@ -14,6 +21,7 @@ import { EmptyStateComponent } from '../../components/empty-state/empty-state.co
 import { DatePicker } from 'primeng/datepicker';
 import { DividerModule } from 'primeng/divider';
 import { Breadcrumb } from 'primeng/breadcrumb';
+import { DeviceDetailService } from './device-detail.service';
 
 @Component({
   selector: 'app-device-detail',
@@ -41,20 +49,58 @@ export class DeviceDetailComponent {
   selectedFrequencyOption = signal('');
   deviceData = deviceDetailQuery(this.deviceId).deviceDataQuery;
   deviceInfo = deviceDetailQuery(this.deviceId).deviceInfoQuery;
-  selectedDate = signal<Date[]>([]);
+  selectedDate = signal<Date | null>(null);
   startTime = signal<Date | null>(null);
   endTime = signal<Date | null>(null);
+
   items = [{ label: '' }];
   home = { icon: 'pi pi-home', url: '/' };
+
+  deviceService = inject(DeviceDetailService);
 
   constructor() {
     effect(() => {
       this.deviceData.data() ? this.transformDataForChart() : null;
+
+      if (this.selectedDate() && this.startTime() && this.endTime()) {
+        this.updateFilters();
+      }
     });
   }
 
   ngOnInit(): void {
     this.initChart();
+  }
+
+  updateFilters() {
+    const date = this.selectedDate();
+    const start = this.startTime();
+    const end = this.endTime();
+
+    this.deviceService.date.set(date ? date.toISOString().split('T')[0] : '');
+
+    this.deviceService.startTime.set(start ? start.toISOString() : '');
+
+    this.deviceService.endTime.set(end ? end.toISOString() : '');
+
+    this.deviceData.refetch();
+  }
+
+  clearFilters() {
+    this.selectedDate.set(null);
+    this.startTime.set(null);
+    this.endTime.set(null);
+
+    this.deviceService.date.set('');
+    this.deviceService.startTime.set('');
+    this.deviceService.endTime.set('');
+  }
+
+  addQueryParams() {}
+
+  refreshData() {
+    this.deviceData.refetch();
+    this.deviceInfo.refetch();
   }
 
   breadCrumbItem = computed(() => {

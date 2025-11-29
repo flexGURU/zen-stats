@@ -41,13 +41,9 @@
               icon="pi pi-refresh"
               label="Reload"
               severity="danger"
-              (onClick)="deviceData.refetch()"
+              (onClick)="refreshData()"
             ></p-button>
           </div>
-        </div>
-        } @else if (!deviceData.data()?.length) {
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <app-empty-state (reload)="deviceData.refetch()" />
         </div>
         } @else {
 
@@ -112,11 +108,12 @@
 
           <div class="pt-2">
             <p-button
-              label="Apply Filters"
-              icon="pi pi-filter"
+              label="Clear Filters"
+              icon="pi pi-times"
               size="small"
               class="w-full"
               [outlined]="true"
+              (onClick)="clearFilters()"
             ></p-button>
           </div>
         </div>
@@ -156,8 +153,7 @@
             class="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center rounded-xl"
           >
             <div class="text-center text-gray-500">
-              <i class="pi pi-chart-line text-4xl mb-4 block"></i>
-              <p>No data available for visualization</p>
+              <app-empty-state (reload)="refreshData()" />
             </div>
           </div>
           }
