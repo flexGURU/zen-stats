@@ -1,6 +1,18 @@
 <p-drawer [(visible)]="visible" header="Zen">
   <div class="flex flex-col justify-between h-full">
-    <div></div>
+    <div>
+      @for (item of sidebarLinks(); track $index) {
+      <a
+        [routerLink]="item.route"
+        (click)="visible.set(false)"
+        routerLinkActive="active"
+        class="flex items-center p-3 my-2 text-lg font-medium text-gray-700 rounded-lg hover:bg-gray-200 hover:text-gray-900"
+      >
+        <i [class]="'pi pi-' + item.icon + ' mr-3 text-xl'"></i>
+        <span>{{ item.label }}</span>
+      </a>
+      }
+    </div>
     <button
       pButton
       type="button"

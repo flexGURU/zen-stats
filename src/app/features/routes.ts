@@ -20,5 +20,12 @@ export const routes: Routes = [
         (m) => m.DeviceDetailComponent
       ),
   },
+  {
+    path: 'reactors',
+    loadComponent: () =>
+      import('./pages/reactor/reactor.component').then(
+        (m) => m.ReactorComponent
+      ),
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];
