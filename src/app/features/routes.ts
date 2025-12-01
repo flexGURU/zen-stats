@@ -20,5 +20,19 @@ export const routes: Routes = [
         (m) => m.DeviceDetailComponent
       ),
   },
+  {
+    path: 'reactors',
+    loadComponent: () =>
+      import('./pages/reactor/reactor.component').then(
+        (m) => m.ReactorComponent
+      ),
+  },
+  {
+    path: 'batch-experiments',
+    loadComponent: () =>
+      import('./pages/batch-experiment/batch-experiment.component').then(
+        (m) => m.BatchExperimentComponent
+      ),
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];

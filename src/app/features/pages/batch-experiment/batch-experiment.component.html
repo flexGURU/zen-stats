@@ -1,0 +1,87 @@
+<div class="max-w-5xl mx-auto px-4 py-6 md:py-10 lg:py-16">
+  <div class="flex flex-col md:flex-row justify-between px-2">
+    <div>
+      <h1 class="text-3xl font-bold mb-4">Batch Experiments</h1>
+      <p class="text-gray-600 mb-6">
+        Manage and monitor your batch experiments
+      </p>
+    </div>
+    <div>
+      <button
+        (click)="displayModal.set(true)"
+        pButton
+        type="button"
+        label="Add Batch"
+        icon="pi pi-plus"
+        class="mb-4"
+      ></button>
+    </div>
+  </div>
+  <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
+    <p-table
+      [value]="batchExperiments"
+      dataKey="id"
+      [tableStyle]="{ 'min-width': '50rem' }"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-reactor>
+        <tr [pSelectableRow]="reactor">
+          <td>{{ reactor.name }}</td>
+          <td>{{ reactor.status }}</td>
+          <td>
+            <button
+              (click)="editBatchExperiment(reactor)"
+              pButton
+              type="button"
+              class="p-button-text"
+              icon="pi pi-pencil"
+            ></button>
+            <button
+              (click)="deleteBatchExperiment(reactor.id)"
+              pButton
+              type="button"
+              class="p-button-text"
+              severity="danger"
+              icon="pi pi-trash"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="5">
+            <span class="flex flex-col items-center justify-center gap-3 py-6">
+              No Reactors found.
+              <button
+                pButton
+                type="button"
+                label="Refresh"
+                icon="pi pi-refresh"
+                size="small"
+              ></button>
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+<p-dialog
+  maskStyleClass="backdrop-blur-sm"
+  header="Reactor Details"
+  [header]="isEditMode() ? 'Edit reactor' : 'Add New reactor'"
+  [(visible)]="displayModal"
+  [modal]="true"
+  [style]="{ width: '1400px' }"
+  maximizable="true"
+>
+  <app-batch-experiment-modal />
+</p-dialog>
+<p-toast />
+<p-confirmdialog />

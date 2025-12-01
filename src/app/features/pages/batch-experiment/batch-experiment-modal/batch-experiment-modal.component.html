@@ -1,0 +1,420 @@
+<form [formGroup]="batchForm" (ngSubmit)="onSubmit()">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <!-- General Information Section -->
+    <div class="bg-white rounded-lg p-6 shadow-sm">
+      <h2 class="text-lg font-semibold mb-6 text-gray-900">
+        General information
+      </h2>
+
+      <div class="space-y-4">
+        <div>
+          <label
+            for="batchId"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Batch ID
+          </label>
+          <input
+            pInputText
+            id="batchId"
+            formControlName="batchId"
+            class="w-full"
+            placeholder="R01/001"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label
+            for="operator"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Operator
+          </label>
+          <input
+            pInputText
+            id="operator"
+            formControlName="operator"
+            class="w-full"
+            placeholder="Enter operator name"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label
+            for="date"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Date
+          </label>
+          <p-datepicker
+            inputId="date"
+            formControlName="date"
+            [showIcon]="true"
+            dateFormat="dd/mm/yy"
+            placeholder="DD/MM/YYYY"
+          ></p-datepicker>
+        </div>
+
+        <div>
+          <label
+            for="reactorId"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Reactor ID
+          </label>
+          <input
+            pInputText
+            id="reactorId"
+            formControlName="reactorId"
+            class="w-full"
+            placeholder="R01"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label
+            for="blockId"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Block ID
+          </label>
+          <input
+            pInputText
+            id="blockId"
+            formControlName="blockId"
+            class="w-full"
+            placeholder="B01/001"
+            type="text"
+          />
+        </div>
+
+        <div class="flex flex-col gap-4">
+          <div>
+            <label
+              for="timeStart"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Time start
+            </label>
+            <p-datepicker
+              id="timeStart"
+              formControlName="timeStart"
+              class="w-full"
+              placeholder="14:30:30"
+              type="time"
+              [timeOnly]="true"
+            />
+          </div>
+
+          <div>
+            <label
+              for="timeEnd"
+              class="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Time end
+            </label>
+            <p-datepicker
+              id="timeEnd"
+              formControlName="timeEnd"
+              class="w-full"
+              placeholder="14:35:00"
+              [timeOnly]="true"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Material Feedstock Section -->
+    <div class="bg-white rounded-lg p-6 shadow-sm">
+      <h2 class="text-lg font-semibold mb-6 text-gray-900">
+        Material feedstock
+      </h2>
+
+      <div class="space-y-4">
+        <div>
+          <label
+            for="mixDesign"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Mix design
+          </label>
+          <input
+            pInputText
+            id="mixDesign"
+            formControlName="mixDesign"
+            class="w-full"
+            placeholder="1:2:3"
+            type="text"
+          />
+        </div>
+
+        <div>
+          <label
+            for="cement"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Cement (kg)
+          </label>
+          <p-inputNumber
+            inputId="cement"
+            formControlName="cement"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2"
+            placeholder="1.2"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div>
+          <label
+            for="fineAggregate"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Fine Aggregate (kg)
+          </label>
+          <p-inputNumber
+            inputId="fineAggregate"
+            formControlName="fineAggregate"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2"
+            placeholder="2.7"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div>
+          <label
+            for="coarseAggregate"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Coarse Aggregate (kg)
+          </label>
+          <p-inputNumber
+            inputId="coarseAggregate"
+            formControlName="coarseAggregate"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2"
+            placeholder="4.1"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div>
+          <label
+            for="water"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Water
+          </label>
+          <p-inputNumber
+            inputId="water"
+            formControlName="water"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2"
+            placeholder="0.6"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div>
+          <label
+            for="waterCementRatio"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Water cement ratio
+          </label>
+          <p-inputNumber
+            inputId="waterCementRatio"
+            formControlName="waterCementRatio"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="0.55"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Block size (mm)
+          </label>
+          <div class="flex w-3/4 items-center gap-2">
+            <p-inputNumber
+              formControlName="blockSizeLength"
+              [showButtons]="true"
+              buttonLayout="vertical"
+              spinnerMode="vertical"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="0"
+              placeholder="150"
+              class="w-1/4 mr-1"
+              size="small"
+            ></p-inputNumber>
+            <span class="text-gray-500 text-xl">×</span>
+            <p-inputNumber
+              formControlName="blockSizeWidth"
+              [showButtons]="true"
+              buttonLayout="vertical"
+              spinnerMode="vertical"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="0"
+              placeholder="150"
+              class="w-1/4 mr-1"
+              size="small"
+            ></p-inputNumber>
+            <span class="text-gray-500 text-xl">×</span>
+            <p-inputNumber
+              formControlName="blockSizeHeight"
+              [showButtons]="true"
+              buttonLayout="vertical"
+              spinnerMode="vertical"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="0"
+              placeholder="150"
+              class="w-1/4 mr-1"
+              size="small"
+            ></p-inputNumber>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exposure Conditions Section -->
+    <div class="bg-white rounded-lg p-6 shadow-sm">
+      <h2 class="text-lg font-semibold mb-6 text-gray-900">
+        Exposure conditions
+      </h2>
+
+      <div class="space-y-4">
+        <div class="flex items-center gap-3">
+          <p-checkbox
+            inputId="gasCO2"
+            formControlName="gasCO2"
+            [binary]="true"
+          ></p-checkbox>
+          <label for="gasCO2" class="text-sm text-gray-700 cursor-pointer">
+            Gas CO2
+          </label>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <p-checkbox
+            inputId="deliveryPressure"
+            formControlName="deliveryPressure"
+            [binary]="true"
+          ></p-checkbox>
+          <label
+            for="deliveryPressure"
+            class="text-sm text-gray-700 cursor-pointer"
+          >
+            Delivery pressure
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample Tests Section -->
+    <div class="bg-white rounded-lg p-6 shadow-sm col-span-1 lg:col-span-3">
+      <h2 class="text-lg font-semibold mb-6 text-gray-900">Sample Tests</h2>
+
+      <div class="space-y-4">
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center pb-4 border-b border-gray-200"
+        >
+          <div class="text-sm font-medium text-gray-700">TGA mass</div>
+          <div>
+            <div class="text-sm text-gray-500">Sample ID</div>
+            <div>
+              <input
+                pInputText
+                formControlName="tgaSampleId"
+                class="w-full"
+                placeholder="B01/001/S1"
+                type="text"
+              />
+            </div>
+          </div>
+          <div>
+            <p-fileUpload
+              mode="advanced"
+              chooseLabel="Pdf"
+              [auto]="true"
+              (onSelect)="onFileSelect($event, 'tgaFile')"
+              accept=".pdf"
+              [maxFileSize]="10000000"
+            ></p-fileUpload>
+          </div>
+        </div>
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center pb-4 border-b border-gray-200"
+        >
+          <div class="text-sm font-medium text-gray-700">XRD notes</div>
+
+          <div>
+            <div class="text-sm text-gray-500">Sample ID</div>
+
+            <div>
+              <input
+                pInputText
+                formControlName="xrdSampleId"
+                class="w-full"
+                placeholder="B01/001/S2"
+                type="text"
+              />
+            </div>
+          </div>
+
+          <div>
+            <p-fileUpload
+              mode="advanced"
+              chooseLabel="Pdf"
+              [auto]="true"
+              (onSelect)="onFileSelect($event, 'xrdFile')"
+              accept=".pdf"
+              [maxFileSize]="10000000"
+            ></p-fileUpload>
+          </div>
+        </div>
+
+        <div
+          class="grid grid-cols-1 md:grid-cols-3 gap-4 items-center pb-4 border-b border-gray-200"
+        >
+          <div>
+            <div class="text-sm font-medium text-gray-700">
+              Composition of feedstock
+            </div>
+            <div>
+              <p-fileUpload
+                mode="advanced"
+                chooseLabel="Pdf"
+                [auto]="true"
+                (onSelect)="onFileSelect($event, 'compositionFile')"
+                accept=".pdf"
+                [maxFileSize]="10000000"
+              ></p-fileUpload>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex justify-end gap-4 bg-white rounded-lg p-6 shadow-sm">
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      type="button"
+      (onClick)="reset()"
+    ></p-button>
+    <p-button
+      label="Submit"
+      type="submit"
+      [disabled]="!batchForm.valid"
+    ></p-button>
+  </div>
+</form>
