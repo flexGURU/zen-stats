@@ -21,8 +21,8 @@ export class SidebarComponent {
   logOut() {}
 
   sidebarContent = [
-    { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
     { label: 'Profile', icon: 'pi pi-user', route: '/profile' },
+    { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
     { label: 'Reactor', icon: 'pi pi-cog', route: '/reactors' },
     {
       label: 'Batch Experiment',

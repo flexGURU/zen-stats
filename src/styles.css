@@ -2,5 +2,5 @@
 @import "primeicons/primeicons.css";
 
 .active {
-  @apply bg-green-600 text-white font-semibold shadow-md rounded transition duration-200;
+  @apply bg-[#22c55e] text-white font-semibold shadow-md rounded transition duration-200;
 }
