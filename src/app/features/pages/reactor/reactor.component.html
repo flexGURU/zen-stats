@@ -1,25 +1,47 @@
 <div class="max-w-5xl mx-auto px-4 py-6 md:py-10 lg:py-16">
-  <div class="flex flex-col md:flex-row justify-between px-2">
-    <div>
-      <h1 class="text-3xl font-bold mb-4">Reactors</h1>
-      <p class="text-gray-600 mb-6">Manage and monitor your reactors</p>
+  <div>
+    <div class="flex flex-col md:flex-row justify-between px-2">
+      <div>
+        <h1 class="text-3xl font-bold mb-4">Reactors</h1>
+        <p class="text-gray-600 mb-6">Manage and monitor your reactors</p>
+      </div>
+      <div>
+        <button
+          (click)="displayModal.set(true)"
+          pButton
+          type="button"
+          label="Add Reactor"
+          icon="pi pi-plus"
+          class="mb-4"
+        ></button>
+      </div>
     </div>
-    <div>
-      <button
-        (click)="displayModal.set(true)"
-        pButton
-        type="button"
-        label="Add Reactor"
-        icon="pi pi-plus"
-        class="mb-4"
-      ></button>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-2 mb-4">
+      <div class="w-1/2">
+        <label
+          for="batchId"
+          class="block text-sm font-medium text-gray-700 mb-2"
+        >
+          Reactor Name
+        </label>
+        <input
+          pInputText
+          id="reactorName"
+          [(ngModel)]="reactorName"
+          class="w-full"
+          placeholder="R01"
+          type="text"
+          pSize="small"
+        />
+      </div>
     </div>
   </div>
   <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
     <p-table
       [value]="reactors"
       dataKey="id"
-      [tableStyle]="{ 'min-width': '50rem' }"
+      size="small"
+      [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
     >
       <ng-template #header>
         <tr>
@@ -76,7 +98,7 @@
   [header]="isEditMode() ? 'Edit reactor' : 'Add New reactor'"
   [(visible)]="displayModal"
   [modal]="true"
-  [style]="{ width: '400px' }"
+  [style]="{ width: '400px', }"
   maximizable="true"
 >
   <app-reactor-modal

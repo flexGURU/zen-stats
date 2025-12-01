@@ -6,6 +6,8 @@ import { ReactorModalComponent } from './reactor-modal/reactor-modal.component';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-reactor',
@@ -15,6 +17,8 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
     Dialog,
     ReactorModalComponent,
     ToastModule,
+    FormsModule,
+    InputTextModule,
     ConfirmDialog,
   ],
   templateUrl: './reactor.component.html',
@@ -29,6 +33,7 @@ export class ReactorComponent {
   selectedReactor = signal<{ id: number; name: string; status: string } | null>(
     null
   );
+  reactorName = signal('');
 
   reactors = [
     { id: 1, name: 'Reactor A', status: 'Active' },
