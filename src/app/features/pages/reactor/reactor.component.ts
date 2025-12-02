@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { Dialog } from 'primeng/dialog';
@@ -8,6 +8,7 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { Reactor } from '../../../core/models/models';
 
 @Component({
   selector: 'app-reactor',
@@ -30,18 +31,35 @@ export class ReactorComponent {
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
   loading = signal(true);
-  selectedReactor = signal<{ id: number; name: string; status: string } | null>(
-    null
-  );
+  selectedReactor = signal<Reactor | null>(null);
   reactorName = signal('');
 
-  reactors = [
-    { id: 1, name: 'Reactor A', status: 'Active' },
-    { id: 2, name: 'Reactor B', status: 'Inactive' },
-    { id: 3, name: 'Reactor C', status: 'Maintenance' },
+  constructor() {
+    effect(() => {
+      if (!this.displayModal()) {
+        this.selectedReactor.set(null);
+      }
+    });
+  }
+
+  reactors: Reactor[] = [
+    {
+      id: 1,
+      name: 'Reactor A',
+      status: 'Active',
+      pdfUrl: 'http://example.com/reactorA.pdf',
+      pathway: 'Gaseous',
+    },
+    {
+      id: 2,
+      name: 'Reactor B',
+      status: 'Inactive',
+      pdfUrl: 'http://example.com/reactorB.pdf',
+      pathway: 'Liquid',
+    },
   ];
 
-  editReactor = (reactor: { id: number; name: string; status: string }) => {
+  editReactor = (reactor: Reactor) => {
     this.selectedReactor.set(reactor);
     this.isEditMode.set(true);
     this.displayModal.set(true);

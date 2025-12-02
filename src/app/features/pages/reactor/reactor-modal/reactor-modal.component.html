@@ -2,9 +2,9 @@
   <div class="mb-4">
     <label
       for="reactorName"
-      class="block text-sm font-medium text-gray-700 mb-2"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
     >
-      Reactor Name
+      Name
     </label>
 
     <input
@@ -22,23 +22,94 @@
     <small class="text-red-600">Reactor Name is required.</small>
     } }
   </div>
-
   <div class="mb-4">
     <label
-      for="reactorStatus"
-      class="block text-sm font-medium text-gray-700 mb-2"
+      for="reactorName"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
     >
-      Reactor Status
+      ID
     </label>
 
     <input
       pInputText
-      id="reactorStatus"
-      formControlName="status"
+      id="reactorId"
+      formControlName="reactorId"
       class="w-full border border-gray-300 rounded-md p-2"
-      placeholder="Enter reactor status"
+      placeholder="Enter reactor ID"
       type="text"
     />
+
+    @if (formControls['reactorId'].invalid && (formControls['reactorId'].dirty
+    || formControls['reactorId'].touched)) { @if
+    (formControls['reactorId'].errors?.['required']) {
+    <small class="text-red-600">Reactor ID is required.</small>
+    } }
+  </div>
+  <div class="mb-4">
+    <label
+      for="reactorStatus"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
+    >
+      Status
+    </label>
+
+    <p-select
+      formControlName="status"
+      class="w-full"
+      focusOnHover="true"
+      selectOnFocus="true"
+      appendTo="body"
+      checkmark="true"
+      [options]="statusOptions()"
+      placeholder="Select status"
+    />
+    @if (formControls['status'].invalid && (formControls['status'].dirty ||
+    formControls['status'].touched)) { @if
+    (formControls['status'].errors?.['required']) {
+    <small class="text-red-600">Reactor Status is required.</small>
+    } }
+  </div>
+
+  <div class="mb-4">
+    <label
+      for="reactorStatus"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
+    >
+      Pathway
+    </label>
+
+    <p-select
+      formControlName="pathway"
+      class="w-full"
+      focusOnHover="true"
+      selectOnFocus="true"
+      appendTo="body"
+      checkmark="true"
+      [options]="pathwayOptions()"
+      placeholder="Select pathway"
+    />
+    @if (formControls['pathway'].invalid && (formControls['pathway'].dirty ||
+    formControls['pathway'].touched)) { @if
+    (formControls['pathway'].errors?.['required']) {
+    <small class="text-red-600">Reactor Pathway is required.</small>
+    } }
+  </div>
+  <div class="mb-4">
+    <label
+      for="reactorStatus"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
+    >
+      PDF Upload
+    </label>
+
+    <p-fileUpload
+      mode="advanced"
+      chooseLabel="Pdf"
+      [auto]="true"
+      (onSelect)="onFileSelect($event, 'tgaFile')"
+      accept=".pdf"
+      [maxFileSize]="10000000"
+    ></p-fileUpload>
     @if (formControls['status'].invalid && (formControls['status'].dirty ||
     formControls['status'].touched)) { @if
     (formControls['status'].errors?.['required']) {

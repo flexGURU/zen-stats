@@ -46,6 +46,7 @@
       <ng-template #header>
         <tr>
           <th>Name</th>
+          <th>ID</th>
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -53,6 +54,7 @@
       <ng-template #body let-reactor>
         <tr [pSelectableRow]="reactor">
           <td>{{ reactor.name }}</td>
+          <td>{{ reactor.id }}</td>
           <td>{{ reactor.status }}</td>
           <td>
             <button
@@ -95,16 +97,13 @@
 <p-dialog
   maskStyleClass="backdrop-blur-sm"
   header="Reactor Details"
-  [header]="isEditMode() ? 'Edit reactor' : 'Add New reactor'"
+  [header]="selectedReactor() ? 'Edit reactor' : 'Add New reactor'"
   [(visible)]="displayModal"
   [modal]="true"
-  [style]="{ width: '400px', }"
+  [style]="{ width: '500px', }"
   maximizable="true"
 >
-  <app-reactor-modal
-    [(visible)]="displayModal"
-    [reactorData]="selectedReactor()"
-  />
+  <app-reactor-modal [reactorData]="selectedReactor()" />
 </p-dialog>
 <p-toast />
 <p-confirmdialog />

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
   Form,
   FormBuilder,
@@ -13,6 +13,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-batch-experiment-modal',
@@ -25,6 +26,7 @@ import { ButtonModule } from 'primeng/button';
     CheckboxModule,
     ButtonModule,
     FileUploadModule,
+    SelectModule,
   ],
   templateUrl: './batch-experiment-modal.component.html',
   styles: ``,
@@ -32,6 +34,11 @@ import { ButtonModule } from 'primeng/button';
 export class BatchExperimentModalComponent {
   batchForm!: FormGroup;
   private fb = inject(FormBuilder);
+  co2Forms = signal([
+    { label: 'Gaseous', value: 'gaseous' },
+    { label: 'Carbonated', value: 'carbonated' },
+    { label: 'Liquid', value: 'liquid' },
+  ]);
   constructor() {
     this.initializeForm();
   }
@@ -58,6 +65,12 @@ export class BatchExperimentModalComponent {
 
       gasCO2: [false],
       deliveryPressure: [false],
+
+      co2Form: ['', Validators.required],
+      co2Mass: [null, [Validators.required, Validators.min(0)]],
+      injectionPressure: [null, [Validators.required, Validators.min(0)]],
+      headSpace: [null, [Validators.required, Validators.min(0)]],
+      reactionTime: [null, [Validators.required, Validators.min(0)]],
 
       tgaSampleId: [''],
       xrdSampleId: [''],

@@ -24,3 +24,11 @@ export interface Device {
   status: boolean;
   created_at: string;
 }
+
+export interface Reactor {
+  id: number;
+  name: string;
+  status: 'Active' | 'Inactive';
+  pdfUrl: string;
+  pathway: 'Gaseous' | 'Carbonated' | 'Liquid';
+}

@@ -289,36 +289,95 @@
       </h2>
 
       <div class="space-y-4">
-        <div class="flex items-center gap-3">
-          <p-checkbox
-            inputId="gasCO2"
-            formControlName="gasCO2"
-            [binary]="true"
-          ></p-checkbox>
-          <label for="gasCO2" class="text-sm text-gray-700 cursor-pointer">
-            Gas CO2
-          </label>
-        </div>
-
-        <div class="flex items-center gap-3">
-          <p-checkbox
-            inputId="deliveryPressure"
-            formControlName="deliveryPressure"
-            [binary]="true"
-          ></p-checkbox>
+        <div class="mb-4">
           <label
-            for="deliveryPressure"
-            class="text-sm text-gray-700 cursor-pointer"
+            for="reactorStatus"
+            class="block text-sm font-medium text-gray-700 ml-2 mb-2"
           >
-            Delivery pressure
+            Co2 Form
           </label>
+
+          <p-select
+            formControlName="co2Form"
+            class="w-full"
+            focusOnHover="true"
+            appendTo="body"
+            checkmark="true"
+            showClear="true"
+            [options]="co2Forms()"
+            placeholder="Select CO2 form"
+          />
+        </div>
+        <div>
+          <label
+            for="waterCementRatio"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Co2 Mass
+          </label>
+          <p-inputNumber
+            inputId="co2Mass"
+            formControlName="co2Mass"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="Enter mass in Gramms"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+        <div>
+          <label
+            for="waterCementRatio"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Injection Pressure
+          </label>
+          <p-inputNumber
+            inputId="injectionPressure"
+            formControlName="injectionPressure"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="Enter pressure"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+        <div>
+          <label
+            for="waterCementRatio"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Head Space
+          </label>
+          <p-inputNumber
+            inputId="headSpace"
+            formControlName="headSpace"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="Enter head space"
+            styleClass="w-full"
+          ></p-inputNumber>
+        </div>
+        <div>
+          <label
+            for="waterCementRatio"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Reaction Time
+          </label>
+          <p-inputNumber
+            inputId="reactionTime"
+            formControlName="reactionTime"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            placeholder="Enter reaction time in seconds"
+            styleClass="w-full"
+          ></p-inputNumber>
         </div>
       </div>
     </div>
 
     <!-- Sample Tests Section -->
     <div class="bg-white rounded-lg p-6 shadow-sm col-span-1 lg:col-span-3">
-      <h2 class="text-lg font-semibold mb-6 text-gray-900">Sample Tests</h2>
+      <h2 class="text-lg font-semibold mb-6 text-gray-900">Analytical Tests</h2>
 
       <div class="space-y-4">
         <div
