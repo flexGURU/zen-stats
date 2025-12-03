@@ -9,6 +9,9 @@ import { ConfirmDialog } from 'primeng/confirmdialog';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { Reactor } from '../../../core/models/models';
+import { reactorQuery } from './reactor.query';
+import { ProgressSpinner } from "primeng/progressspinner";
+import { Message } from "primeng/message";
 
 @Component({
   selector: 'app-reactor',
@@ -21,7 +24,9 @@ import { Reactor } from '../../../core/models/models';
     FormsModule,
     InputTextModule,
     ConfirmDialog,
-  ],
+    ProgressSpinner,
+    Message
+],
   templateUrl: './reactor.component.html',
   providers: [ConfirmationService, MessageService],
 })
@@ -34,30 +39,20 @@ export class ReactorComponent {
   selectedReactor = signal<Reactor | null>(null);
   reactorName = signal('');
 
+  reactors = reactorQuery().reactorData;
+
   constructor() {
     effect(() => {
       if (!this.displayModal()) {
         this.selectedReactor.set(null);
       }
     });
-  }
 
-  reactors: Reactor[] = [
-    {
-      id: 1,
-      name: 'Reactor A',
-      status: 'Active',
-      pdfUrl: 'http://example.com/reactorA.pdf',
-      pathway: 'Gaseous',
-    },
-    {
-      id: 2,
-      name: 'Reactor B',
-      status: 'Inactive',
-      pdfUrl: 'http://example.com/reactorB.pdf',
-      pathway: 'Liquid',
-    },
-  ];
+    effect(()=> {
+      console.log("reacots", this.reactors.data());
+      
+    })
+  }
 
   editReactor = (reactor: Reactor) => {
     this.selectedReactor.set(reactor);

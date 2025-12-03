@@ -25,6 +25,7 @@ export class SidebarComponent {
   sidebarContent = [
     { label: 'Profile', icon: 'pi pi-user', route: '/profile' },
     { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
+    { label: 'Device', icon: 'pi pi-tablet', route: '/devices' }, 
     { label: 'Reactor', icon: 'pi pi-cog', route: '/reactors' },
     {
       label: 'Batch Experiment',

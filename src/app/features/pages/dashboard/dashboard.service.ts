@@ -11,13 +11,4 @@ export class DashboardService {
   private readonly apiUrl = environment.APIURL;
 
   private http = inject(HttpClient);
-
-  getDevices(): Observable<Device[]> {
-    return this.http.get<{ data: Device[] }>(`${this.apiUrl}/devices`).pipe(
-      map((response) => response.data),
-      catchError((err) => {
-        throw new Error(err);
-      })
-    );
-  }
 }

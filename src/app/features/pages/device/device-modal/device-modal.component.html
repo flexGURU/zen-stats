@@ -1,0 +1,58 @@
+<form [formGroup]="deviceForm" (ngSubmit)="onSubmit()">
+  <div class="mb-4">
+    <label
+      for="reactorName"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
+    >
+      Name
+    </label>
+
+    <input
+      pInputText
+      id="reactorName"
+      formControlName="name"
+      class="w-full border border-gray-300 rounded-md p-2"
+      placeholder="Enter reactor name"
+      type="text"
+    />
+
+    @if (formControls['name'].invalid && (formControls['name'].dirty ||
+    formControls['name'].touched)) { @if
+    (formControls['name'].errors?.['required']) {
+    <small class="text-red-600">Reactor Name is required.</small>
+    } }
+  </div>
+  <div class="mb-4">
+    <label
+      for="reactorName"
+      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
+    >
+      Status
+    </label>
+
+    <p-select
+      formControlName="status"
+      class="w-full"
+      focusOnHover="true"
+      appendTo="body"
+      checkmark="true"
+      showClear="true"
+      [options]="statusOptions()"
+      placeholder="Select status"
+    />
+
+    @if (formControls['status'].invalid && (formControls['status'].dirty ||
+    formControls['status'].touched)) { @if
+    (formControls['status'].errors?.['required']) {
+    <small class="text-red-600">Status is required.</small>
+    } }
+  </div>
+
+  <button
+    pButton
+    type="submit"
+    label="Submit"
+    [disabled]="deviceForm.invalid"
+    [loading]="loading()"
+  ></button>
+</form>

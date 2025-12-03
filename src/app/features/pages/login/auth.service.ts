@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { catchError, Observable, tap } from 'rxjs';
+import { catchError, map, Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
 import { LoginResponse, User } from '../../../core/models/models';
 import { Router } from '@angular/router';
@@ -84,5 +84,20 @@ export class AuthService {
         this.router.navigate(['/login']);
       })
     );
+  };
+
+  resetPassword = (email: string): Observable<string> => {
+    return this.http
+      .post<{ data: string }>(`${this.apiUrl}/request-password-reset`, {
+        email,
+      })
+      .pipe(
+        map((response) => response.data),
+        catchError((error) => {
+          console.error('Reset Password error:', error);
+          let errorMessage = `${error.error.message}. An error occurred during password reset.`;
+          throw new Error(errorMessage);
+        })
+      );
   };
 }

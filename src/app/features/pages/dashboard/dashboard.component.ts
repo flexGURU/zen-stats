@@ -9,19 +9,8 @@ import { EmptyStateComponent } from '../../components/empty-state/empty-state.co
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
-    DeviceCardComponent,
-    RouterLink,
-    ProgressSpinnerModule,
-    MessageModule,
-    ButtonModule,
-    EmptyStateComponent,
-  ],
+  imports: [],
   templateUrl: './dashboard.component.html',
   styles: ``,
 })
-export class DashboardComponent {
-  devices = dashboardQuery();
-
-  constructor() {}
-}
+export class DashboardComponent {}

@@ -1,0 +1,118 @@
+<div class="max-w-5xl mx-auto px-4 py-6 md:py-10 lg:py-16">
+  @if (devices.isLoading()) {
+  <div class="flex flex-col justify-center items-center">
+    <p-progress-spinner
+      strokeWidth="4"
+      fill="transparent"
+      animationDuration=".5s"
+      ariaLabel="Loading Zen Stats"
+    />
+    <span>Loading Devices</span>
+  </div>
+  } @else if (devices.isError()) {
+  <div class="flex flex-col justify-center items-center">
+    <p-message severity="error"
+      >Error loading . Please try again.
+      <p-button
+        size="small"
+        icon="pi pi-refresh"
+        label="Reload"
+        severity="danger"
+        (onClick)="devices.refetch()"
+      ></p-button
+    ></p-message>
+  </div>
+  } @else if (devices.data()?.length) {
+  <div>
+    <div class="flex flex-col md:flex-row justify-between px-2">
+      <div>
+        <h1 class="text-3xl font-bold mb-4">Devices</h1>
+      </div>
+      <div>
+        <button
+          (click)="displayModal.set(true)"
+          pButton
+          type="button"
+          label="Add Device"
+          icon="pi pi-plus"
+          class="mb-4"
+        ></button>
+      </div>
+    </div>
+
+    <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
+      <p-table
+        [value]="devices.data() ?? []"
+        dataKey="id"
+        size="small"
+        [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
+      >
+        <ng-template #header>
+          <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-device>
+          <tr [pSelectableRow]="device">
+            <td>{{ device.name }}</td>
+            <td>{{ device.status }}</td>
+            <td>
+              <button
+                (click)="editDevice(device)"
+                pButton
+                type="button"
+                class="p-button-text"
+                icon="pi pi-pencil"
+              ></button>
+              <button
+                (click)="deleteDevice(device.id)"
+                pButton
+                type="button"
+                class="p-button-text"
+                severity="danger"
+                icon="pi pi-trash"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="5">
+              <span
+                class="flex flex-col items-center justify-center gap-3 py-6"
+              >
+                No devices found.
+                <button
+                  pButton
+                  type="button"
+                  label="Refresh"
+                  icon="pi pi-refresh"
+                  size="small"
+                ></button>
+              </span>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  }
+</div>
+<p-dialog
+  maskStyleClass="backdrop-blur-sm"
+  header="Device Details"
+  [header]="selectedDevice() ? 'Edit device' : 'Add New device'"
+  [(visible)]="displayModal"
+  [modal]="true"
+  [style]="{ width: '500px', }"
+  maximizable="true"
+>
+  <app-device-modal
+    [deviceData]="selectedDevice()"
+    (mutationStatus)="onCreateDevice($event)"
+  />
+</p-dialog>
+<p-toast />
+<p-confirmdialog />

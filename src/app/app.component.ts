@@ -6,7 +6,7 @@ import { MainLayoutComponent } from './components/main-layout/main-layout.compon
 
 @Component({
   selector: 'app-root',
-  imports: [ButtonModule, MainLayoutComponent, RouterOutlet],
+  imports: [ButtonModule, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })

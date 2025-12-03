@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -36,6 +36,7 @@ import { Router } from '@angular/router';
 export class LoginComponent {
   loginForm!: FormGroup;
   loading = signal(false);
+  resetPassword = signal(false);
 
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
@@ -46,6 +47,17 @@ export class LoginComponent {
     if (this.authService.isLoggedIn()) {
       this.router.navigateByUrl('/dashboard');
     }
+
+    effect(() => {
+      if (this.resetPassword() || !this.resetPassword()) {
+        this.loginForm.reset();
+      }
+    });
+    effect(() => {
+      this.resetPassword()
+        ? this.loginForm.get('password')?.disable()
+        : this.loginForm.get('password')?.enable();
+    });
   }
 
   initialiseForm = () => {
@@ -59,12 +71,17 @@ export class LoginComponent {
     return this.loginForm.controls;
   }
 
-  login() {
+  onSubmit() {
     if (this.loginForm.invalid) return;
 
     let { email, password } = this.loginForm.getRawValue();
     this.loading.set(true);
 
+    let action = this.resetPassword();
+    action ? this.forgotPassword(email) : this.login(email, password);
+  }
+
+  login(email: string, password: string) {
     this.authService
       .login(email, password)
       .pipe(finalize(() => this.loading.set(false)))
@@ -81,6 +98,29 @@ export class LoginComponent {
             severity: 'error',
             summary: 'Login Failed',
             detail: error.message || 'An error occurred during login.',
+          });
+        },
+      });
+  }
+
+  forgotPassword(email: string) {
+    this.authService
+      .resetPassword(email)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (data) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Password Reset',
+            detail: data,
+          });
+          this.resetPassword.set(false);
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Reset Failed',
+            detail: error,
           });
         },
       });
