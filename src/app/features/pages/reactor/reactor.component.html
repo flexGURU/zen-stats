@@ -1,9 +1,32 @@
 <div class="max-w-5xl mx-auto px-4 py-6 md:py-10 lg:py-16">
+  @if (reactors.isLoading()) {
+  <div class="flex flex-col justify-center items-center">
+    <p-progress-spinner
+      strokeWidth="4"
+      fill="transparent"
+      animationDuration=".5s"
+      ariaLabel="Loading Zen Stats"
+    />
+    <span>Loading Reactors</span>
+  </div>
+  } @else if (reactors.isError()) {
+  <div class="flex flex-col justify-center items-center">
+    <p-message severity="error"
+      >Error loading Zen Stats. Please try again.
+      <p-button
+        size="small"
+        icon="pi pi-refresh"
+        label="Reload"
+        severity="danger"
+        (onClick)="reactors.refetch()"
+      ></p-button
+    ></p-message>
+  </div>
+  } @else if (reactors.data()) {
   <div>
     <div class="flex flex-col md:flex-row justify-between px-2">
       <div>
         <h1 class="text-3xl font-bold mb-4">Reactors</h1>
-        <p class="text-gray-600 mb-6">Manage and monitor your reactors</p>
       </div>
       <div>
         <button
@@ -16,94 +39,56 @@
         ></button>
       </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
-      <div class="w-1/2">
-        <label
-          for="batchId"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Reactor Name
-        </label>
-        <input
-          pInputText
-          id="reactorName"
-          [(ngModel)]="reactorName"
-          class="w-full"
-          placeholder="R01"
-          type="text"
-          pSize="small"
-        />
-      </div>
-    </div>
-  </div>
-  <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
-    <p-table
-      [value]="reactors"
-      dataKey="id"
-      size="small"
-      [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
-    >
-      <ng-template #header>
-        <tr>
-          <th>Name</th>
-          <th>ID</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-reactor>
-        <tr [pSelectableRow]="reactor">
-          <td>{{ reactor.name }}</td>
-          <td>{{ reactor.id }}</td>
-          <td>{{ reactor.status }}</td>
-          <td>
-            <button
-              (click)="editReactor(reactor)"
-              pButton
-              type="button"
-              class="p-button-text"
-              icon="pi pi-pencil"
-            ></button>
-            <button
-              (click)="deleteReactor(reactor.id)"
-              pButton
-              type="button"
-              class="p-button-text"
-              severity="danger"
-              icon="pi pi-trash"
-            ></button>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="5">
-            <span class="flex flex-col items-center justify-center gap-3 py-6">
-              No Reactors found.
+
+    <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
+      <p-table
+        [value]="reactors.data() ?? []"
+        dataKey="id"
+        size="small"
+        [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
+      >
+        <ng-template #header>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Pathway</th>
+            <th>Device</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-reactor>
+          <tr [pSelectableRow]="reactor">
+            <td>{{ reactor.name }}</td>
+            <td>{{ reactor.type }}</td>
+            <td>{{ reactor.pathway }}</td>
+            <td>{{ reactor.deviceId }}</td>
+            <td>
               <button
                 pButton
                 type="button"
-                label="Refresh"
-                icon="pi pi-refresh"
-                size="small"
+                icon="pi pi-pencil"
+                class="p-button-text p-button-sm"
+                (click)="editReactor(reactor)"
               ></button>
-            </span>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </div>
+  }
+
+  <p-dialog
+    maskStyleClass="backdrop-blur-sm"
+    header="Reactor Details"
+    [header]="selectedReactor() ? 'Edit reactor' : 'Add New reactor'"
+    [(visible)]="displayModal"
+    [modal]="true"
+    [style]="{ width: '500px', }"
+    maximizable="true"
+  >
+    <app-reactor-modal [reactorData]="selectedReactor()" />
+  </p-dialog>
+  <p-toast />
+  <p-confirmdialog />
 </div>
-<p-dialog
-  maskStyleClass="backdrop-blur-sm"
-  header="Reactor Details"
-  [header]="selectedReactor() ? 'Edit reactor' : 'Add New reactor'"
-  [(visible)]="displayModal"
-  [modal]="true"
-  [style]="{ width: '500px', }"
-  maximizable="true"
->
-  <app-reactor-modal [reactorData]="selectedReactor()" />
-</p-dialog>
-<p-toast />
-<p-confirmdialog />

@@ -1,0 +1,75 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-100 px-2">
+  <div class="w-full max-w-md p-8 bg-white shadow-md rounded-lg">
+    <div class="flex flex-col justify-center items-center">
+      <img src="assets/zen logo.png" class="" alt="Zen Stats Logo" />
+    </div>
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="loginForm" autocomplete="on">
+      <div class="mb-4">
+        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          pInputText
+          type="email"
+          formControlName="email"
+          class="w-full"
+          placeholder="Enter your email"
+          autocomplete="email"
+          spellcheck="false"
+        />
+        @if (formControls['email'].invalid && formControls['email'].touched) {
+        <small class="text-red-600">Valid email is required.</small>
+        }
+      </div>
+
+      @if(!resetPassword()){
+      <div class="mb-6">
+        <label
+          for="password"
+          class="block text-sm font-medium text-gray-700 mb-1"
+        >
+          Password
+        </label>
+        <div class="w-full">
+          <p-password
+            [toggleMask]="true"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            class="w-full"
+            styleClass="w-full"
+            [feedback]="false"
+          />
+        </div>
+
+        @if(formControls['password'].invalid &&
+        formControls['password'].touched) {
+        <small class="text-red-600">Password is required.</small>
+        }
+      </div>
+      }
+      <div class="flex justify-center mb-4">
+        <a
+          class="text-center cursor-pointer text-green-600 sm:w-1/3 hover:underline"
+          (click)="this.resetPassword.set(!this.resetPassword())"
+        >
+          <small class="text-center">
+            {{ resetPassword() ? "Back to login" : "Forgot password?" }}
+          </small>
+        </a>
+      </div>
+
+      <button
+        pButton
+        [label]="resetPassword() ? 'Reset Password' : 'Login'"
+        [disabled]="loginForm.invalid"
+        class="w-full"
+        [loading]="loading()"
+      ></button>
+    </form>
+  </div>
+</div>
+<p-toast></p-toast>

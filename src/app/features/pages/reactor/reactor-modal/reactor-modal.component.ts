@@ -12,6 +12,7 @@ import { FileUpload } from 'primeng/fileupload';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { Reactor } from '../../../../core/models/models';
+import { ReactorService } from '../reactor.service';
 
 @Component({
   selector: 'app-reactor-modal',
@@ -35,16 +36,16 @@ export class ReactorModalComponent {
   reactorData = input<Reactor | null>(null);
 
   private fb = inject(FormBuilder);
+  private reactorService = inject(ReactorService);
 
   statusOptions = signal([
-    { label: 'Active', value: 'Active' },
-    { label: 'Inactive', value: 'Inactive' },
-    { label: 'Maintenance', value: 'Maintenance' },
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
   ]);
   pathwayOptions = signal([
-    { label: 'Gaseous', value: 'Gaseous' },
-    { label: 'Carbonated', value: 'Carbonated' },
-    { label: 'Liquid', value: 'Liquid' },
+    { label: 'Gaseous', value: 'gaseous' },
+    { label: 'Carbonated', value: 'carbonated' },
+    { label: 'Liquid', value: 'liquid' },
   ]);
 
   constructor() {
@@ -52,8 +53,6 @@ export class ReactorModalComponent {
     this.populateForm();
     effect(() => {
       if (!this.visible()) {
-        console.log('ssss', this.visible());
-
         this.reactorForm.reset();
       }
     });
@@ -87,10 +86,13 @@ export class ReactorModalComponent {
   }
 
   onSubmit() {
-    if (this.reactorForm.valid) {
-      console.log(this.reactorForm.value);
-    }
+    if (this.reactorForm.invalid) return;
   }
+
+  createReactor() {
+    
+  }
+  updateReactor() {}
   onFileSelect(event: any, fieldName: string) {
     const file = event.files[0];
     this.reactorForm.patchValue({ [fieldName]: file });
