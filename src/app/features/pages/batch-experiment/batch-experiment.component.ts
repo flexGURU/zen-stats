@@ -47,15 +47,7 @@ export class BatchExperimentComponent {
     { id: 3, name: 'Experiment 3', status: 'Failed' },
   ];
 
-  constructor() {
-    effect(() => {
-      console.log('Filter Values Changed:', {
-        batchId: this.batchId(),
-        reactorName: this.reactorName(),
-        date: this.date(),
-      });
-    });
-  }
+  constructor() {}
 
   editBatchExperiment = (experiment: {
     id: number;

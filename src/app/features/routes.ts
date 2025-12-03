@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -12,6 +13,7 @@ export const routes: Routes = [
       import('./pages/dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
+    canActivate: [authGuard],
   },
   {
     path: 'device/:deviceId',
@@ -19,6 +21,7 @@ export const routes: Routes = [
       import('./pages/device-detail/device-detail.component').then(
         (m) => m.DeviceDetailComponent
       ),
+    canActivate: [authGuard],
   },
   {
     path: 'reactors',
@@ -26,6 +29,7 @@ export const routes: Routes = [
       import('./pages/reactor/reactor.component').then(
         (m) => m.ReactorComponent
       ),
+    canActivate: [authGuard],
   },
   {
     path: 'batch-experiments',
@@ -33,6 +37,8 @@ export const routes: Routes = [
       import('./pages/batch-experiment/batch-experiment.component').then(
         (m) => m.BatchExperimentComponent
       ),
+    canActivate: [authGuard],
   },
+
   { path: '**', redirectTo: 'dashboard' },
 ];

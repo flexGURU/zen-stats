@@ -32,3 +32,19 @@ export interface Reactor {
   pdfUrl: string;
   pathway: 'Gaseous' | 'Carbonated' | 'Liquid';
 }
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  roles: 'admin' | 'user';
+  isActive: boolean;
+  created_at: string;
+}
+
+export interface LoginResponse  {
+  access_token: string;
+  refresh_token: string;
+  user: User;
+}

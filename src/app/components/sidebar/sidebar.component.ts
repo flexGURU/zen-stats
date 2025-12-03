@@ -3,6 +3,8 @@ import { Component, inject, model, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
+import { AuthService } from '../../features/pages/login/auth.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,7 +20,7 @@ import { DrawerModule } from 'primeng/drawer';
 })
 export class SidebarComponent {
   visible = model(false);
-  logOut() {}
+  loading = signal(false);
 
   sidebarContent = [
     { label: 'Profile', icon: 'pi pi-user', route: '/profile' },
@@ -32,4 +34,16 @@ export class SidebarComponent {
   ];
 
   sidebarLinks = signal(this.sidebarContent);
+  private logout = inject(AuthService).logout;
+  logOut() {
+    this.loading.set(true);
+    this.logout()
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {},
+        error: (err) => {
+          console.error('Logout failed', err);
+        },
+      });
+  }
 }
