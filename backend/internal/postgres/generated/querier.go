@@ -6,22 +6,46 @@ package generated
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Querier interface {
 	CountDeviceReadings(ctx context.Context, deviceID int64) (int64, error)
+	CountListExperiments(ctx context.Context, arg CountListExperimentsParams) (int64, error)
+	CountListReactors(ctx context.Context, arg CountListReactorsParams) (int64, error)
+	CountListUsers(ctx context.Context, arg CountListUsersParams) (int64, error)
 	CreateDevice(ctx context.Context, arg CreateDeviceParams) (Device, error)
+	CreateExperiment(ctx context.Context, arg CreateExperimentParams) (Experiment, error)
+	CreateReactor(ctx context.Context, arg CreateReactorParams) (Reactor, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteDevice(ctx context.Context, id int64) error
+	DeleteExperiment(ctx context.Context, id int64) error
+	DeleteReactor(ctx context.Context, id int64) error
 	GetDevice(ctx context.Context, id int64) (Device, error)
 	GetDeviceReadings(ctx context.Context, arg GetDeviceReadingsParams) ([]SensorReading, error)
 	GetDeviceReadingsPaged(ctx context.Context, arg GetDeviceReadingsPagedParams) ([]SensorReading, error)
 	GetDeviceStats(ctx context.Context) (GetDeviceStatsRow, error)
+	GetExperimentByID(ctx context.Context, id int64) (Experiment, error)
+	GetReactorByID(ctx context.Context, id int64) (Reactor, error)
 	GetReadingByID(ctx context.Context, id int64) (SensorReading, error)
 	GetReadingsByDate(ctx context.Context, arg GetReadingsByDateParams) ([]SensorReading, error)
 	GetReadingsByTimeRange(ctx context.Context, arg GetReadingsByTimeRangeParams) ([]SensorReading, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByID(ctx context.Context, id int64) (User, error)
+	GetUserPasswordByEmail(ctx context.Context, email string) (string, error)
+	GetUserRefreshTokenByID(ctx context.Context, id int64) (pgtype.Text, error)
 	InsertReading(ctx context.Context, arg InsertReadingParams) (SensorReading, error)
 	ListDevices(ctx context.Context) ([]Device, error)
+	ListExperiments(ctx context.Context, arg ListExperimentsParams) ([]Experiment, error)
+	ListReactors(ctx context.Context, arg ListReactorsParams) ([]Reactor, error)
+	ListUsers(ctx context.Context, arg ListUsersParams) ([]User, error)
 	UpdateDevice(ctx context.Context, arg UpdateDeviceParams) (Device, error)
+	UpdateExperiment(ctx context.Context, arg UpdateExperimentParams) (Experiment, error)
+	UpdateReactor(ctx context.Context, arg UpdateReactorParams) error
+	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
+	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) error
+	UpdateUserRefreshToken(ctx context.Context, arg UpdateUserRefreshTokenParams) error
 }
 
 var _ Querier = (*Queries)(nil)

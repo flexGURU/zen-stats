@@ -1,5 +1,5 @@
 DATABASE_URL=postgres://backend:secret@localhost:5432/zed?sslmode=disable
-MIGRATIONS_PATH=file:///home/emilio-cliff/Zen/backend/internal/postgres/migrations
+MIGRATIONS_PATH=file:///home/emilio-cliff/zen-stats/backend/internal/postgres/migrations
 
 test:
 	go test -v ./...

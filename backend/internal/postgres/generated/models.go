@@ -5,8 +5,54 @@
 package generated
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Role string
+
+const (
+	RoleAdmin Role = "admin"
+	RoleUser  Role = "user"
+)
+
+func (e *Role) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Role(s)
+	case string:
+		*e = Role(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Role: %T", src)
+	}
+	return nil
+}
+
+type NullRole struct {
+	Role  Role `json:"role"`
+	Valid bool `json:"valid"` // Valid is true if Role is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullRole) Scan(value interface{}) error {
+	if value == nil {
+		ns.Role, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Role.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullRole) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Role), nil
+}
 
 type Device struct {
 	ID        int64     `json:"id"`
@@ -16,9 +62,48 @@ type Device struct {
 	CreatedAt time.Time `json:"created_at"`
 }
 
+type Experiment struct {
+	ID                 int64              `json:"id"`
+	BatchID            string             `json:"batch_id"`
+	Operator           string             `json:"operator"`
+	Date               time.Time          `json:"date"`
+	ReactorID          int64              `json:"reactor_id"`
+	BlockID            string             `json:"block_id"`
+	TimeStart          pgtype.Time        `json:"time_start"`
+	TimeEnd            pgtype.Time        `json:"time_end"`
+	MaterialFeedstock  []byte             `json:"material_feedstock"`
+	ExposureConditions []byte             `json:"exposure_conditions"`
+	AnalticalTests     []byte             `json:"analtical_tests"`
+	DeletedAt          pgtype.Timestamptz `json:"deleted_at"`
+	CreatedAt          time.Time          `json:"created_at"`
+}
+
+type Reactor struct {
+	ID        int64              `json:"id"`
+	DeviceID  int64              `json:"device_id"`
+	Name      string             `json:"name"`
+	Status    string             `json:"status"`
+	Pathway   pgtype.Text        `json:"pathway"`
+	PdfUrl    pgtype.Text        `json:"pdf_url"`
+	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
+	CreatedAt time.Time          `json:"created_at"`
+}
+
 type SensorReading struct {
 	ID        int64     `json:"id"`
 	DeviceID  int64     `json:"device_id"`
 	Payload   []byte    `json:"payload"`
 	Timestamp time.Time `json:"timestamp"`
+}
+
+type User struct {
+	ID           int64       `json:"id"`
+	Name         string      `json:"name"`
+	Email        string      `json:"email"`
+	PhoneNumber  pgtype.Text `json:"phone_number"`
+	Password     string      `json:"password"`
+	Role         Role        `json:"role"`
+	IsActive     bool        `json:"is_active"`
+	RefreshToken pgtype.Text `json:"refresh_token"`
+	CreatedAt    time.Time   `json:"created_at"`
 }

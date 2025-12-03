@@ -7,16 +7,310 @@
 	},
 	"item": [
 		{
-			"name": "Device",
+			"name": "Users",
 			"item": [
 				{
-					"name": "Create Device",
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData = pm.response.json();",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"",
+									"    if (jsonData.access_token) {",
+									"        pm.collectionVariables.set(\"access_token\", jsonData.access_token);",
+									"        pm.collectionVariables.set(\"refresh_token\", jsonData.refresh_token);",
+									"    } else {",
+									"        console.log(\"No access_token found in response\");",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"esp-20\",\n    \"status\": true\n}",
+							"raw": "{\n    \"email\": \"emiliocliff@gmail.com\",\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Emilio Cliff\",\n    \"email\": \"emiliocliff2@gmail.com\",\n    \"role\": \"user\",\n    \"isActive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Users",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    // \"phoneNumber\": \"0718750145\"\n    \"role\": \"user\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh_token\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/refresh-token",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"refresh-token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Request Password Reset",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"emiliocliff@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/request-password-reset",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"request-password-reset"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"admin\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgyZmJhYTY5LWQwMGEtMTFmMC04ZTlhLWQ0YzllZmU5MDE4YSIsInVzZXJfaWQiOjEsIm5hbWUiOiJFbWlsaW8gQ2xpZmYiLCJlbWFpbCI6ImVtaWxpb2NsaWZmQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlzcyI6IlpFTl9CQUNLRU5EIiwiZXhwIjoxNzY0NzQwNDYxLCJpYXQiOjE3NjQ3NDA0MDF9.xQD9uvMupnEKS4em-C0ubn46bK-ZLNx91NGb-tf-YDw",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reset-password"
+							],
+							"query": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgyZmJhYTY5LWQwMGEtMTFmMC04ZTlhLWQ0YzllZmU5MDE4YSIsInVzZXJfaWQiOjEsIm5hbWUiOiJFbWlsaW8gQ2xpZmYiLCJlbWFpbCI6ImVtaWxpb2NsaWZmQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlzcyI6IlpFTl9CQUNLRU5EIiwiZXhwIjoxNzY0NzQwNDYxLCJpYXQiOjE3NjQ3NDA0MDF9.xQD9uvMupnEKS4em-C0ubn46bK-ZLNx91NGb-tf-YDw"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Device",
+			"item": [
+				{
+					"name": "Create Device",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"esp-22\",\n    \"status\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -163,7 +457,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"co2\": 1111,\n    \"pressure\": 73.1,\n    \"temperature\": 28.2,\n    \"server_timestamp\": \"2025-11-16T08:35:09.485Z\"\n}",
+							"raw": "{\n    \"co2\": 1111,\n    \"pressure\": 73.1,\n    \"temperature\": 28.2,\n    \"server_timestamp\": \"2025-01-15T08:35:00.485Z\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -182,7 +476,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "3"
+									"value": "1"
 								}
 							]
 						}
@@ -267,6 +561,364 @@
 			]
 		},
 		{
+			"name": "Reactors",
+			"item": [
+				{
+					"name": "Create Reactor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"deviceId\": 2,\n    \"name\": \"Raector B\",\n    \"status\": \"active\",\n    \"pathway\": \"here\",\n    \"pdfUrl\": \"Baba\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/reactors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reactors"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reactor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reactors/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reactors",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Reactor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"pdfUrl\": \"hello\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/reactors/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reactors",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Reactor",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reactors/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reactors",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "3"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Reactors",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reactors",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reactors"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Experiments",
+			"item": [
+				{
+					"name": "Create Experiment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "//   {\n//     \"batchId\": \"BATCH-001\",\n//     \"reactorId\": 1,\n//     \"operator\": \"John Doe\",\n//     \"date\": \"2025-01-15\",\n//     \"blockId\": \"BLK-1001\",\n//     \"timeStart\": \"08:30\",\n//     \"timeEnd\": \"8:35\",\n\n//     \"mixDesign\": \"MD-Standard\",\n//     \"cement\": \"250\",\n//     \"fineAggregate\": \"500\",\n//     \"coarseAggregate\": \"700\",\n//     \"water\": \"150\",\n//     \"waterCementRatio\": \"0.45\",\n//     \"blockSizeLength\": \"40\",\n//     \"blockSizeWidth\": \"20\",\n//     \"blockSizeHeight\": \"15\",\n\n//     \"co2Form\": \"gas\",\n//     \"co2Mass\": \"15\",\n//     \"injectionPressure\": \"2.1\",\n//     \"headSpace\": \"40\",\n//     \"reactionTime\": \"120\",\n\n//     \"analyticalTests\": [\n//       {\n//         \"name\": \"TGA\",\n//         \"sampleId\": \"TGA-001\",\n//         \"date\": \"2025-01-15\",\n//         \"pdfUrl\": \"https://example.com/tga001.pdf\"\n//       },\n//       {\n//         \"name\": \"XRD\",\n//         \"sampleId\": \"XRD-001\",\n//         \"date\": \"2025-01-15\",\n//         \"pdfUrl\": \"https://example.com/xrd001.pdf\"\n//       }\n//     ]\n//   }\n\n  {\n    \"batchId\": \"BATCH-002\",\n    \"reactorId\": 1,\n    \"operator\": \"Sarah Lee\",\n    \"date\": \"2025-01-16\",\n    \"blockId\": \"BLK-1002\",\n    \"timeStart\": \"09:00:00\",\n    \"timeEnd\": \"11:10:00\",\n\n    \"mixDesign\": \"MD-HighStrength\",\n    \"cement\": \"300\",\n    \"fineAggregate\": \"450\",\n    \"coarseAggregate\": \"650\",\n    \"water\": \"140\",\n    \"waterCementRatio\": \"0.40\",\n    \"blockSizeLength\": \"45\",\n    \"blockSizeWidth\": \"22\",\n    \"blockSizeHeight\": \"18\",\n\n    \"co2Form\": \"liquid\",\n    \"co2Mass\": \"20\",\n    \"injectionPressure\": \"2.5\",\n    \"headSpace\": \"35\",\n    \"reactionTime\": \"100\",\n\n    \"analyticalTests\": [\n      {\n        \"name\": \"TGA\",\n        \"sampleId\": \"TGA-002\",\n        \"date\": \"2025-01-16\",\n        \"pdfUrl\": \"https://example.com/tga002.pdf\"\n      }\n    ]\n  }\n\n//   {\n//     \"batchId\": \"BATCH-003\",\n//     \"reactorId\": 3,\n//     \"operator\": \"Carlos Vega\",\n//     \"date\": \"2025-01-17\",\n//     \"blockId\": \"BLK-1003\",\n//     \"timeStart\": \"07:45:00\",\n//     \"timeEnd\": \"10:00:00\",\n\n//     \"mixDesign\": \"MD-Lightweight\",\n//     \"cement\": \"200\",\n//     \"fineAggregate\": \"400\",\n//     \"coarseAggregate\": \"600\",\n//     \"water\": \"130\",\n//     \"waterCementRatio\": \"0.50\",\n//     \"blockSizeLength\": \"38\",\n//     \"blockSizeWidth\": \"20\",\n//     \"blockSizeHeight\": \"14\",\n\n//     \"co2Form\": \"gas\",\n//     \"co2Mass\": \"18\",\n//     \"injectionPressure\": \"2.2\",\n//     \"headSpace\": \"45\",\n//     \"reactionTime\": \"150\",\n\n//     \"analyticalTests\": []\n//   },\n\n//   {\n//     \"batchId\": \"BATCH-004\",\n//     \"reactorId\": 4,\n//     \"operator\": \"Emily Clark\",\n//     \"date\": \"2025-01-18\",\n//     \"blockId\": \"BLK-1004\",\n//     \"timeStart\": \"10:15:00\",\n//     \"timeEnd\": \"12:30:00\",\n\n//     \"mixDesign\": \"MD-Dense\",\n//     \"cement\": \"280\",\n//     \"fineAggregate\": \"520\",\n//     \"coarseAggregate\": \"720\",\n//     \"water\": \"160\",\n//     \"waterCementRatio\": \"0.42\",\n//     \"blockSizeLength\": \"50\",\n//     \"blockSizeWidth\": \"25\",\n//     \"blockSizeHeight\": \"20\",\n\n//     \"co2Form\": \"liquid\",\n//     \"co2Mass\": \"25\",\n//     \"injectionPressure\": \"2.9\",\n//     \"headSpace\": \"30\",\n//     \"reactionTime\": \"95\",\n\n//     \"analyticalTests\": [\n//       {\n//         \"name\": \"XRF\",\n//         \"sampleId\": \"XRF-004\",\n//         \"date\": \"2025-01-18\",\n//         \"pdfUrl\": \"https://example.com/xrf004.pdf\"\n//       }\n//     ]\n//   },\n\n//   {\n//     \"batchId\": \"BATCH-005\",\n//     \"reactorId\": 5,\n//     \"operator\": \"Michael Chen\",\n//     \"date\": \"2025-01-19\",\n//     \"blockId\": \"BLK-1005\",\n//     \"timeStart\": \"06:30:00\",\n//     \"timeEnd\": \"08:45:00\",\n\n//     \"mixDesign\": \"MD-Ultra\",\n//     \"cement\": \"320\",\n//     \"fineAggregate\": \"480\",\n//     \"coarseAggregate\": \"680\",\n//     \"water\": \"145\",\n//     \"waterCementRatio\": \"0.38\",\n//     \"blockSizeLength\": \"42\",\n//     \"blockSizeWidth\": \"21\",\n//     \"blockSizeHeight\": \"16\",\n\n//     \"co2Form\": \"gas\",\n//     \"co2Mass\": \"22\",\n//     \"injectionPressure\": \"2.6\",\n//     \"headSpace\": \"37\",\n//     \"reactionTime\": \"110\",\n\n//     \"analyticalTests\": [\n//       {\n//         \"name\": \"FTIR\",\n//         \"sampleId\": \"FTIR-005\",\n//         \"date\": \"2025-01-19\",\n//         \"pdfUrl\": \"https://example.com/ftir005.pdf\"\n//       },\n//       {\n//         \"name\": \"SEM\",\n//         \"sampleId\": \"SEM-005\",\n//         \"date\": \"2025-01-19\",\n//         \"pdfUrl\": \"https://example.com/sem005.pdf\"\n//       }\n//     ]\n//   }\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/experiments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"experiments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Experiment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/experiments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"experiments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Experiments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/experiments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"experiments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Experiment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "  {\n    \"batchId\": \"BATCH-003\",\n    \"reactorId\": 3,\n    \"operator\": \"Carlos Vega\",\n    \"date\": \"2025-01-17\",\n    \"blockId\": \"BLK-1003\",\n    \"timeStart\": \"07:45:00\",\n    \"timeEnd\": \"10:00:00\",\n\n    \"mixDesign\": \"MD-Lightweight\",\n    \"cement\": \"200\",\n    \"fineAggregate\": \"400\",\n    \"coarseAggregate\": \"600\",\n    \"water\": \"130\",\n    \"waterCementRatio\": \"0.50\",\n    \"blockSizeLength\": \"38\",\n    \"blockSizeWidth\": \"20\",\n    \"blockSizeHeight\": \"14\",\n\n    \"co2Form\": \"gas\",\n    \"co2Mass\": \"18\",\n    \"injectionPressure\": \"2.2\",\n    \"headSpace\": \"45\",\n    \"reactionTime\": \"150\",\n\n    \"analyticalTests\": []\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/experiments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"experiments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Experiment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/experiments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"experiments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Health Check",
 			"request": {
 				"method": "GET",
@@ -309,6 +961,16 @@
 	"variable": [
 		{
 			"key": "base_url",
+			"value": "https://zen-stats-production.up.railway.app/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
 			"value": "",
 			"type": "string"
 		}

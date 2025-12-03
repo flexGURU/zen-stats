@@ -2,12 +2,9 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
-	"sort"
-	"strings"
 	"time"
 
 	"github.com/Edwin9301/Zen/backend/internal/postgres"
@@ -23,12 +20,16 @@ type Server struct {
 	config     pkg.Config
 	tokenMaker pkg.JWTMaker
 	repo       *postgres.PostgresRepo
+
+	email pkg.EmailSender
 }
 
 func NewServer(config pkg.Config, tokenMaker pkg.JWTMaker, repo *postgres.PostgresRepo) *Server {
 	if config.ENVIRONMENT == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
+	emailSender := pkg.NewGmailSender(config.EMAIL_SENDER_NAME, config.EMAIL_SENDER_ADDRESS, config.EMAIL_SENDER_PASSWORD)
 
 	r := gin.Default()
 
@@ -39,6 +40,8 @@ func NewServer(config pkg.Config, tokenMaker pkg.JWTMaker, repo *postgres.Postgr
 		config:     config,
 		tokenMaker: tokenMaker,
 		repo:       repo,
+
+		email: emailSender,
 	}
 
 	s.setUpRoutes()
@@ -49,18 +52,54 @@ func NewServer(config pkg.Config, tokenMaker pkg.JWTMaker, repo *postgres.Postgr
 func (s *Server) setUpRoutes() {
 	s.router.Use(CORSmiddleware(s.config.FRONTEND_URL))
 
+	// Public
 	v1 := s.router.Group("/api/v1")
+
+	// Auth-only group
+	authGroup := v1.Group("/")
+	authGroup.Use(authMiddleware(s.tokenMaker))
+
+	// Admin-only group
+	adminGroup := authGroup.Group("/")
+	adminGroup.Use(adminOnlyMiddleware())
 
 	// health check
 	v1.GET("/health-check", s.healthCheckHandler)
 
+	// auth routes
+	v1.POST("/login", s.login)
+	v1.GET("/logout", s.logout)
+	v1.POST("/refresh-token", s.refreshToken)
+	v1.POST("/request-password-reset", s.requestPasswordReset)
+	v1.POST("/reset-password", s.resetPassword)
+
+	// user routes
+	adminGroup.POST("/users", s.createUser)
+	authGroup.GET("/users/:id", s.getUser)
+	adminGroup.GET("/users", s.listUsers)
+	authGroup.PUT("/users/:id", s.updateUser)
+
+	// experiment routes
+	adminGroup.POST("/experiments", s.createExperiment)
+	authGroup.GET("/experiments/:id", s.getExperiment)
+	authGroup.GET("/experiments", s.listExperiments)
+	adminGroup.PUT("/experiments/:id", s.updateExperiment)
+	adminGroup.DELETE("/experiments/:id", s.deleteExperiment)
+
+	// reactor routes
+	adminGroup.POST("/reactors", s.createReactor)
+	authGroup.GET("/reactors/:id", s.getReactor)
+	adminGroup.PUT("/reactors/:id", s.updateReactor)
+	adminGroup.DELETE("/reactors/:id", s.deleteReactor)
+	authGroup.GET("/reactors", s.listReactors)
+
 	// device routes
-	v1.POST("/devices", s.createDeviceHandler)
-	v1.GET("/devices/:id", s.getDeviceByIDHandler)
-	v1.GET("/devices", s.listDevicesHandler)
-	v1.PUT("/devices/:id", s.updateDeviceHandler)
-	v1.DELETE("/devices/:id", s.deleteDeviceHandler)
-	v1.GET("/devices/stats", s.getDeviceStatsHandler)
+	adminGroup.POST("/devices", s.createDeviceHandler)
+	authGroup.GET("/devices/:id", s.getDeviceByIDHandler)
+	authGroup.GET("/devices", s.listDevicesHandler)
+	adminGroup.PUT("/devices/:id", s.updateDeviceHandler)
+	adminGroup.DELETE("/devices/:id", s.deleteDeviceHandler)
+	authGroup.GET("/devices/stats", s.getDeviceStatsHandler)
 
 	// sensor readings routes
 	v1.POST("/readings/:id", s.createSensorReadingHandler)
@@ -116,19 +155,19 @@ func errorResponse(err error) gin.H {
 	}
 }
 
-func constructCacheKey(path string, queryParams map[string][]string) string {
-	const prefix = "/api/v1/"
-	if ok := strings.HasPrefix(path, prefix); ok {
-		path = strings.TrimPrefix(path, prefix)
-	}
+// func constructCacheKey(path string, queryParams map[string][]string) string {
+// 	const prefix = "/api/v1/"
+// 	if ok := strings.HasPrefix(path, prefix); ok {
+// 		path = strings.TrimPrefix(path, prefix)
+// 	}
 
-	var queryParts []string
-	for key, values := range queryParams {
-		for _, value := range values {
-			queryParts = append(queryParts, fmt.Sprintf("%s=%s", key, value))
-		}
-	}
-	sort.Strings(queryParts) // Sort to ensure cache key consistency
+// 	var queryParts []string
+// 	for key, values := range queryParams {
+// 		for _, value := range values {
+// 			queryParts = append(queryParts, fmt.Sprintf("%s=%s", key, value))
+// 		}
+// 	}
+// 	sort.Strings(queryParts) // Sort to ensure cache key consistency
 
-	return fmt.Sprintf("%s:%s", path, strings.Join(queryParts, ":"))
-}
+// 	return fmt.Sprintf("%s:%s", path, strings.Join(queryParts, ":"))
+// }

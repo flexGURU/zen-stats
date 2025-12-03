@@ -11,6 +11,7 @@ type Config struct {
 	DATABASE_URL            string        `mapstructure:"DATABASE_URL"`
 	MIGRATION_PATH          string        `mapstructure:"MIGRATION_PATH"`
 	FRONTEND_URL            []string      `mapstructure:"FRONTEND_URL"`
+	FRONTEND_ACTIVE_URL     string        `mapstructure:"FRONTEND_ACTIVE_URL"`
 	ENVIRONMENT             string        `mapstructure:"ENVIRONMENT"`
 	SERVER_ADDRESS          string        `mapstructure:"SERVER_ADDRESS"`
 	PASSWORD_COST           int           `mapstructure:"PASSWORD_COST"`
@@ -19,6 +20,9 @@ type Config struct {
 	TOKEN_DURATION          time.Duration `mapstructure:"TOKEN_DURATION"`
 	TOKEN_SYMMETRIC_KEY     string        `mapstructure:"TOKEN_SYMMETRIC_KEY"`
 	TOKEN_ISSUER            string        `mapstructure:"TOKEN_ISSUER"`
+	EMAIL_SENDER_NAME       string        `mapstructure:"EMAIL_SENDER_NAME"`
+	EMAIL_SENDER_ADDRESS    string        `mapstructure:"EMAIL_SENDER_ADDRESS"`
+	EMAIL_SENDER_PASSWORD   string        `mapstructure:"EMAIL_SENDER_PASSWORD"`
 }
 
 func LoadConfig(path string) (Config, error) {
@@ -46,6 +50,7 @@ func setDefaults() {
 	viper.SetDefault("DATABASE_URL", "")
 	viper.SetDefault("MIGRATION_PATH", "")
 	viper.SetDefault("FRONTEND_URL", []string{})
+	viper.SetDefault("FRONTEND_ACTIVE_URL", "")
 	viper.SetDefault("ENVIRONMENT", "")
 	viper.SetDefault("SERVER_ADDRESS", "")
 	viper.SetDefault("PASSWORD_COST", 0)
@@ -54,4 +59,7 @@ func setDefaults() {
 	viper.SetDefault("TOKEN_DURATION", 0)
 	viper.SetDefault("TOKEN_SYMMETRIC_KEY", "")
 	viper.SetDefault("TOKEN_ISSUER", "")
+	viper.SetDefault("EMAIL_SENDER_NAME", "")
+	viper.SetDefault("EMAIL_SENDER_ADDRESS", "")
+	viper.SetDefault("EMAIL_SENDER_PASSWORD", "")
 }

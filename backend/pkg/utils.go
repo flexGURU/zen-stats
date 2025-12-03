@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"time"
@@ -9,8 +10,9 @@ import (
 )
 
 const (
-	timeFormat = "2006-01-02T15:04:05Z07:00"
 	dateFormat = "2006-01-02"
+	// timeFormat = "15:04"
+	timeFormat = "2006-01-02T15:04:05Z07:00"
 )
 
 func PgTypeNumericToFloat64(n pgtype.Numeric) float64 {
@@ -33,6 +35,69 @@ func Float64ToPgTypeNumeric(f float64) pgtype.Numeric {
 	}
 
 	return amount
+}
+
+// func PgTimeToTime(t pgtype.Time) time.Time {
+// 	if !t.Valid {
+// 		return time.Now()
+// 	}
+// 	tm := time.Unix(0, t.Microseconds*1000).UTC()
+// 	return tm
+// }
+
+func PgTimeToTime(t pgtype.Time) time.Time {
+	if !t.Valid {
+		return time.Time{}
+	}
+
+	totalMicro := t.Microseconds
+
+	// Convert microseconds since midnight to hour, minute, second, microsecond
+	hours := int(totalMicro / 3_600_000_000)
+	totalMicro %= 3_600_000_000
+
+	minutes := int(totalMicro / 60_000_000)
+	totalMicro %= 60_000_000
+
+	seconds := int(totalMicro / 1_000_000)
+	microseconds := int(totalMicro % 1_000_000)
+
+	// Build a time.Time using today's date and the extracted time
+	now := time.Now()
+	return time.Date(
+		now.Year(), now.Month(), now.Day(),
+		hours, minutes, seconds, microseconds*1000,
+		time.Local,
+	)
+}
+
+func TimeToPgTime(t time.Time) pgtype.Time {
+	hour, min, sec := t.Clock()
+	microseconds := int64(hour*3600+min*60+sec) * 1_000_000
+	return pgtype.Time{
+		Microseconds: microseconds,
+		Valid:        true,
+	}
+}
+
+func StrToPgTime(s string) (pgtype.Time, error) {
+	// Try HH:MM
+	layouts := []string{
+		"15:04",
+		"15:04:05",
+	}
+
+	var parsed time.Time
+	var err error
+
+	for _, layout := range layouts {
+		parsed, err = time.Parse(layout, s)
+		if err == nil {
+			return TimeToPgTime(parsed), nil
+		}
+	}
+
+	return pgtype.Time{}, fmt.Errorf("invalid time format: %s", s)
 }
 
 func StrToTime(s string) (time.Time, error) {
@@ -63,7 +128,7 @@ func StrToDate(s string) (time.Time, error) {
 	return t, nil
 }
 
-func StringToBool(s string) bool {
+func StrToBool(s string) bool {
 	if s == "" {
 		return false
 	}

@@ -18,7 +18,7 @@ func main() {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	config, err := pkg.LoadConfig("/home/emilio-cliff/Zen/backend/.envs/.local")
+	config, err := pkg.LoadConfig("/home/emilio-cliff/zen-stats/backend/.envs/.local")
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}

@@ -14,12 +14,18 @@ import (
 )
 
 type PostgresRepo struct {
-	DeviceRepository *DeviceRepository
+	DeviceRepository     *DeviceRepository
+	UserRepository       *UserRepository
+	ReactorRepository    *ReactorRepository
+	ExperimentRepository *ExperimentRepository
 }
 
 func NewPostgresRepo(store *Store) *PostgresRepo {
 	return &PostgresRepo{
-		DeviceRepository: NewDeviceRepository(store),
+		DeviceRepository:     NewDeviceRepository(store),
+		UserRepository:       NewUserRepository(store),
+		ReactorRepository:    NewReactorRepository(store),
+		ExperimentRepository: NewExperimentRepository(store),
 	}
 }
 

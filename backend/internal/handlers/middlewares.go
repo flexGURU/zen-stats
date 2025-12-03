@@ -68,6 +68,38 @@ func authMiddleware(maker pkg.JWTMaker) gin.HandlerFunc {
 	}
 }
 
+func adminOnlyMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		payload, exists := ctx.Get(authorizationPayloadKey)
+		if !exists {
+			ctx.AbortWithStatusJSON(
+				http.StatusUnauthorized,
+				errorResponse(pkg.Errorf(pkg.AUTHENTICATION_ERROR, "Unauthorized")),
+			)
+			return
+		}
+
+		userPayload, ok := payload.(*pkg.Payload)
+		if !ok {
+			ctx.AbortWithStatusJSON(
+				http.StatusUnauthorized,
+				errorResponse(pkg.Errorf(pkg.AUTHENTICATION_ERROR, "Invalid auth payload")),
+			)
+			return
+		}
+
+		if strings.ToLower(userPayload.Role) != "admin" {
+			ctx.AbortWithStatusJSON(
+				http.StatusForbidden,
+				errorResponse(pkg.Errorf(pkg.INVALID_ERROR, "Admin access required")),
+			)
+			return
+		}
+
+		ctx.Next()
+	}
+}
+
 func CORSmiddleware(frontendUrls []string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		origin := ctx.Request.Header.Get("Origin")
