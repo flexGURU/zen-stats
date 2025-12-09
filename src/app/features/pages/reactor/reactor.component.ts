@@ -54,9 +54,7 @@ export class ReactorComponent {
       }
     });
 
-    effect(() => {
-      console.log('reacots', this.reactors.data());
-    });
+    effect(() => {});
   }
 
   editReactor = (reactor: Reactor) => {
