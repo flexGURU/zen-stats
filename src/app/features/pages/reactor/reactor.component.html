@@ -50,18 +50,28 @@
         <ng-template #header>
           <tr>
             <th>Name</th>
-            <th>Type</th>
             <th>Pathway</th>
-            <th>Device</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </ng-template>
         <ng-template #body let-reactor>
           <tr [pSelectableRow]="reactor">
             <td>{{ reactor.name }}</td>
-            <td>{{ reactor.type }}</td>
             <td>{{ reactor.pathway }}</td>
-            <td>{{ reactor.deviceId }}</td>
+            <td>
+              <span
+                class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': reactor.status === 'active',
+                  'bg-red-100 text-red-800': reactor.status === 'inactive',
+                  'bg-gray-100 text-gray-800':
+                    reactor.status !== 'active' && reactor.status !== 'inactive'
+                }"
+              >
+                {{ reactor.status }}
+              </span>
+            </td>
             <td>
               <button
                 pButton
@@ -69,6 +79,14 @@
                 icon="pi pi-pencil"
                 class="p-button-text p-button-sm"
                 (click)="editReactor(reactor)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-text p-button-sm"
+                (click)="deleteReactor(reactor.id)"
+                severity="danger"
               ></button>
             </td>
           </tr>
@@ -87,7 +105,10 @@
     [style]="{ width: '500px', }"
     maximizable="true"
   >
-    <app-reactor-modal [reactorData]="selectedReactor()" />
+    <app-reactor-modal
+      [reactorData]="selectedReactor()"
+      (mutationStatus)="onMutateReactor($event)"
+    />
   </p-dialog>
   <p-toast />
   <p-confirmdialog />

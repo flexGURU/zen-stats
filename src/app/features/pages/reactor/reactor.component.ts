@@ -10,8 +10,11 @@ import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { Reactor } from '../../../core/models/models';
 import { reactorQuery } from './reactor.query';
-import { ProgressSpinner } from "primeng/progressspinner";
-import { Message } from "primeng/message";
+import { ProgressSpinner } from 'primeng/progressspinner';
+import { Message } from 'primeng/message';
+import { Chip } from 'primeng/chip';
+import { CommonModule } from '@angular/common';
+import { ReactorService } from './reactor.service';
 
 @Component({
   selector: 'app-reactor',
@@ -25,8 +28,9 @@ import { Message } from "primeng/message";
     InputTextModule,
     ConfirmDialog,
     ProgressSpinner,
-    Message
-],
+    Message,
+    CommonModule,
+  ],
   templateUrl: './reactor.component.html',
   providers: [ConfirmationService, MessageService],
 })
@@ -41,6 +45,8 @@ export class ReactorComponent {
 
   reactors = reactorQuery().reactorData;
 
+  private reactorService = inject(ReactorService);
+
   constructor() {
     effect(() => {
       if (!this.displayModal()) {
@@ -48,10 +54,7 @@ export class ReactorComponent {
       }
     });
 
-    effect(()=> {
-      console.log("reacots", this.reactors.data());
-      
-    })
+    effect(() => {});
   }
 
   editReactor = (reactor: Reactor) => {
@@ -73,12 +76,43 @@ export class ReactorComponent {
         label: 'Delete',
       },
       accept: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Confirmed',
-          detail: 'You have accepted',
-        });
+        this.triggerDelete(reactorId);
       },
     });
   };
+
+  triggerDelete(reactorId: number | string) {
+    this.reactorService.deleteReactor(reactorId).subscribe({
+      next: () => {
+        this.handleSuccess('Reactor deleted successfully');
+      },
+      error: (error) => {
+        this.handleError(error.message);
+      },
+    });
+  }
+
+  onMutateReactor(event: Record<string, boolean | string>) {
+    event['status']
+      ? this.handleSuccess(event['detail'])
+      : this.handleError(event['detail']);
+  }
+
+  handleSuccess(detail: string | boolean) {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: detail as string,
+    });
+
+    this.displayModal.set(false);
+    this.reactors.refetch();
+  }
+  handleError(detail: string | boolean = false) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: detail ? (detail as string) : 'Error creating reactor',
+    });
+  }
 }

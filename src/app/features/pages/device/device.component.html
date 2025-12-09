@@ -57,7 +57,18 @@
         <ng-template #body let-device>
           <tr [pSelectableRow]="device">
             <td>{{ device.name }}</td>
-            <td>{{ device.status }}</td>
+            <td>
+              <span
+              class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full"
+              [ngClass]="{
+                'bg-green-100 text-green-800': device.status === true,
+                'bg-red-100 text-red-800': device.status === false,
+                'bg-gray-100 text-gray-800': device.status !== true && device.status !== false
+              }"
+              >
+              {{ device.status === true ? 'active' : device.status === false ? 'inactive' : device.status }}
+              </span>
+            </td>
             <td>
               <button
                 (click)="editDevice(device)"
