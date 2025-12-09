@@ -55,11 +55,12 @@ func (ns NullRole) Value() (driver.Value, error) {
 }
 
 type Device struct {
-	ID        int64     `json:"id"`
-	Name      string    `json:"name"`
-	Status    bool      `json:"status"`
-	Deleted   bool      `json:"deleted"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        int64       `json:"id"`
+	Name      string      `json:"name"`
+	Status    bool        `json:"status"`
+	Deleted   bool        `json:"deleted"`
+	CreatedAt time.Time   `json:"created_at"`
+	ReactorID pgtype.Int8 `json:"reactor_id"`
 }
 
 type Experiment struct {
@@ -80,7 +81,6 @@ type Experiment struct {
 
 type Reactor struct {
 	ID        int64              `json:"id"`
-	DeviceID  int64              `json:"device_id"`
 	Name      string             `json:"name"`
 	Status    string             `json:"status"`
 	Pathway   pgtype.Text        `json:"pathway"`

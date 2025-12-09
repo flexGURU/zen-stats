@@ -11,6 +11,7 @@ CREATE TABLE "sensor_readings" (
     "device_id" bigint NOT NULL,
     "payload" jsonb,
     "timestamp" timestamptz NOT NULL DEFAULT now(),
+    
     CONSTRAINT "fk_device_id" FOREIGN KEY("device_id") REFERENCES "device" ("id")
 );
 

@@ -10,13 +10,14 @@ FROM device
 WHERE id = $1 AND deleted = false;
 
 -- name: CreateDevice :one
-INSERT INTO device (name, status)
-VALUES ($1, $2)
+INSERT INTO device (reactor_id, name, status)
+VALUES (sqlc.narg('reactor_id'), sqlc.arg('name'), sqlc.arg('status'))
 RETURNING *;
 
 -- name: UpdateDevice :one
 UPDATE device
-SET name   = COALESCE(sqlc.narg('name'), name),
+SET reactor_id   = COALESCE(sqlc.narg('reactor_id'), reactor_id),
+    name   = COALESCE(sqlc.narg('name'), name),
     status = COALESCE(sqlc.narg('status'), status)
 WHERE id = sqlc.arg('id') AND deleted = false
 RETURNING *;

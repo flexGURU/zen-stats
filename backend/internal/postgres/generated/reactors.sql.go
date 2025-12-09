@@ -16,59 +16,47 @@ SELECT COUNT(*) AS total_reactors
 FROM reactors
 WHERE deleted_at IS NULL
     AND (
-        $1::bigint IS NULL 
-        OR device_id = $1
+        COALESCE($1, '') = '' 
+        OR LOWER(name) LIKE $1
     )
     AND (
-        COALESCE($2, '') = '' 
-        OR LOWER(name) LIKE $2
+        $2::text IS NULL 
+        OR status = $2
     )
     AND (
         $3::text IS NULL 
-        OR status = $3
-    )
-    AND (
-        $4::text IS NULL 
-        OR pathway = $4
+        OR pathway = $3
     )
 `
 
 type CountListReactorsParams struct {
-	DeviceID pgtype.Int8 `json:"device_id"`
-	Search   interface{} `json:"search"`
-	Status   pgtype.Text `json:"status"`
-	Pathway  pgtype.Text `json:"pathway"`
+	Search  interface{} `json:"search"`
+	Status  pgtype.Text `json:"status"`
+	Pathway pgtype.Text `json:"pathway"`
 }
 
 func (q *Queries) CountListReactors(ctx context.Context, arg CountListReactorsParams) (int64, error) {
-	row := q.db.QueryRow(ctx, countListReactors,
-		arg.DeviceID,
-		arg.Search,
-		arg.Status,
-		arg.Pathway,
-	)
+	row := q.db.QueryRow(ctx, countListReactors, arg.Search, arg.Status, arg.Pathway)
 	var total_reactors int64
 	err := row.Scan(&total_reactors)
 	return total_reactors, err
 }
 
 const createReactor = `-- name: CreateReactor :one
-INSERT INTO reactors (device_id, name, status, pathway, pdf_url)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, device_id, name, status, pathway, pdf_url, deleted_at, created_at
+INSERT INTO reactors (name, status, pathway, pdf_url)
+VALUES ($1, $2, $3, $4)
+RETURNING id, name, status, pathway, pdf_url, deleted_at, created_at
 `
 
 type CreateReactorParams struct {
-	DeviceID int64       `json:"device_id"`
-	Name     string      `json:"name"`
-	Status   string      `json:"status"`
-	Pathway  pgtype.Text `json:"pathway"`
-	PdfUrl   pgtype.Text `json:"pdf_url"`
+	Name    string      `json:"name"`
+	Status  string      `json:"status"`
+	Pathway pgtype.Text `json:"pathway"`
+	PdfUrl  pgtype.Text `json:"pdf_url"`
 }
 
 func (q *Queries) CreateReactor(ctx context.Context, arg CreateReactorParams) (Reactor, error) {
 	row := q.db.QueryRow(ctx, createReactor,
-		arg.DeviceID,
 		arg.Name,
 		arg.Status,
 		arg.Pathway,
@@ -77,7 +65,6 @@ func (q *Queries) CreateReactor(ctx context.Context, arg CreateReactorParams) (R
 	var i Reactor
 	err := row.Scan(
 		&i.ID,
-		&i.DeviceID,
 		&i.Name,
 		&i.Status,
 		&i.Pathway,
@@ -100,7 +87,7 @@ func (q *Queries) DeleteReactor(ctx context.Context, id int64) error {
 }
 
 const getReactorByID = `-- name: GetReactorByID :one
-SELECT id, device_id, name, status, pathway, pdf_url, deleted_at, created_at FROM reactors
+SELECT id, name, status, pathway, pdf_url, deleted_at, created_at FROM reactors
 WHERE id = $1 AND deleted_at IS NULL
 `
 
@@ -109,7 +96,6 @@ func (q *Queries) GetReactorByID(ctx context.Context, id int64) (Reactor, error)
 	var i Reactor
 	err := row.Scan(
 		&i.ID,
-		&i.DeviceID,
 		&i.Name,
 		&i.Status,
 		&i.Pathway,
@@ -121,40 +107,34 @@ func (q *Queries) GetReactorByID(ctx context.Context, id int64) (Reactor, error)
 }
 
 const listReactors = `-- name: ListReactors :many
-SELECT id, device_id, name, status, pathway, pdf_url, deleted_at, created_at FROM reactors
+SELECT id, name, status, pathway, pdf_url, deleted_at, created_at FROM reactors
 WHERE deleted_at IS NULL
     AND (
-        $1::bigint IS NULL 
-        OR device_id = $1
+        COALESCE($1, '') = '' 
+        OR LOWER(name) LIKE $1
     )
     AND (
-        COALESCE($2, '') = '' 
-        OR LOWER(name) LIKE $2
+        $2::text IS NULL 
+        OR status = $2
     )
     AND (
         $3::text IS NULL 
-        OR status = $3
-    )
-    AND (
-        $4::text IS NULL 
-        OR pathway = $4
+        OR pathway = $3
     )
 ORDER BY created_at DESC
-LIMIT $6 OFFSET $5
+LIMIT $5 OFFSET $4
 `
 
 type ListReactorsParams struct {
-	DeviceID pgtype.Int8 `json:"device_id"`
-	Search   interface{} `json:"search"`
-	Status   pgtype.Text `json:"status"`
-	Pathway  pgtype.Text `json:"pathway"`
-	Offset   int32       `json:"offset"`
-	Limit    int32       `json:"limit"`
+	Search  interface{} `json:"search"`
+	Status  pgtype.Text `json:"status"`
+	Pathway pgtype.Text `json:"pathway"`
+	Offset  int32       `json:"offset"`
+	Limit   int32       `json:"limit"`
 }
 
 func (q *Queries) ListReactors(ctx context.Context, arg ListReactorsParams) ([]Reactor, error) {
 	rows, err := q.db.Query(ctx, listReactors,
-		arg.DeviceID,
 		arg.Search,
 		arg.Status,
 		arg.Pathway,
@@ -170,7 +150,6 @@ func (q *Queries) ListReactors(ctx context.Context, arg ListReactorsParams) ([]R
 		var i Reactor
 		if err := rows.Scan(
 			&i.ID,
-			&i.DeviceID,
 			&i.Name,
 			&i.Status,
 			&i.Pathway,
@@ -190,26 +169,23 @@ func (q *Queries) ListReactors(ctx context.Context, arg ListReactorsParams) ([]R
 
 const updateReactor = `-- name: UpdateReactor :exec
 UPDATE reactors
-SET device_id = coalesce($1, device_id),
-    name = coalesce($2, name),
-    status = coalesce($3, status),
-    pathway = coalesce($4, pathway),
-    pdf_url = coalesce($5, pdf_url)
-WHERE id = $6 AND deleted_at IS NULL
+SET name = coalesce($1, name),
+    status = coalesce($2, status),
+    pathway = coalesce($3, pathway),
+    pdf_url = coalesce($4, pdf_url)
+WHERE id = $5 AND deleted_at IS NULL
 `
 
 type UpdateReactorParams struct {
-	DeviceID pgtype.Int8 `json:"device_id"`
-	Name     pgtype.Text `json:"name"`
-	Status   pgtype.Text `json:"status"`
-	Pathway  pgtype.Text `json:"pathway"`
-	PdfUrl   pgtype.Text `json:"pdf_url"`
-	ID       int64       `json:"id"`
+	Name    pgtype.Text `json:"name"`
+	Status  pgtype.Text `json:"status"`
+	Pathway pgtype.Text `json:"pathway"`
+	PdfUrl  pgtype.Text `json:"pdf_url"`
+	ID      int64       `json:"id"`
 }
 
 func (q *Queries) UpdateReactor(ctx context.Context, arg UpdateReactorParams) error {
 	_, err := q.db.Exec(ctx, updateReactor,
-		arg.DeviceID,
 		arg.Name,
 		arg.Status,
 		arg.Pathway,

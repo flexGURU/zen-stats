@@ -9,8 +9,9 @@ import (
 )
 
 type createDeviceRequest struct {
-	Name   string `json:"name" binding:"required"`
-	Status bool   `json:"status"`
+	ReactorID uint32 `json:"reactor_id"`
+	Name      string `json:"name" binding:"required"`
+	Status    bool   `json:"status"`
 }
 
 func (s *Server) createDeviceHandler(ctx *gin.Context) {
@@ -21,8 +22,9 @@ func (s *Server) createDeviceHandler(ctx *gin.Context) {
 	}
 
 	device := &repository.Device{
-		Name:   req.Name,
-		Status: req.Status,
+		ReactorID: req.ReactorID,
+		Name:      req.Name,
+		Status:    req.Status,
 	}
 
 	createdDevice, err := s.repo.DeviceRepository.CreateDevice(ctx, device)

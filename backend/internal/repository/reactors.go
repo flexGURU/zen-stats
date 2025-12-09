@@ -9,7 +9,6 @@ import (
 
 type Reactor struct {
 	ID        uint32     `json:"id"`
-	DeviceID  uint32     `json:"deviceId"`
 	Name      string     `json:"name"`
 	Status    string     `json:"status"`
 	Pathway   string     `json:"pathway"`
@@ -19,18 +18,16 @@ type Reactor struct {
 }
 
 type UpdateReactor struct {
-	ID       uint32  `json:"id"`
-	DeviceID *uint32 `json:"deviceId"`
-	Name     *string `json:"name"`
-	Status   *string `json:"status"`
-	Pathway  *string `json:"pathway"`
-	PdfUrl   *string `json:"pdfUrl"`
+	ID      uint32  `json:"id"`
+	Name    *string `json:"name"`
+	Status  *string `json:"status"`
+	Pathway *string `json:"pathway"`
+	PdfUrl  *string `json:"pdfUrl"`
 }
 
 type FilterReactors struct {
 	Pagination *pkg.Pagination
 	Search     *string
-	DeviceID   *uint32
 	Status     *string
 	Pathway    *string
 }

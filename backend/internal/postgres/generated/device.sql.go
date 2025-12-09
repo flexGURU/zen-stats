@@ -12,18 +12,19 @@ import (
 )
 
 const createDevice = `-- name: CreateDevice :one
-INSERT INTO device (name, status)
-VALUES ($1, $2)
-RETURNING id, name, status, deleted, created_at
+INSERT INTO device (reactor_id, name, status)
+VALUES ($1, $2, $3)
+RETURNING id, name, status, deleted, created_at, reactor_id
 `
 
 type CreateDeviceParams struct {
-	Name   string `json:"name"`
-	Status bool   `json:"status"`
+	ReactorID pgtype.Int8 `json:"reactor_id"`
+	Name      string      `json:"name"`
+	Status    bool        `json:"status"`
 }
 
 func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Device, error) {
-	row := q.db.QueryRow(ctx, createDevice, arg.Name, arg.Status)
+	row := q.db.QueryRow(ctx, createDevice, arg.ReactorID, arg.Name, arg.Status)
 	var i Device
 	err := row.Scan(
 		&i.ID,
@@ -31,6 +32,7 @@ func (q *Queries) CreateDevice(ctx context.Context, arg CreateDeviceParams) (Dev
 		&i.Status,
 		&i.Deleted,
 		&i.CreatedAt,
+		&i.ReactorID,
 	)
 	return i, err
 }
@@ -47,7 +49,7 @@ func (q *Queries) DeleteDevice(ctx context.Context, id int64) error {
 }
 
 const getDevice = `-- name: GetDevice :one
-SELECT id, name, status, deleted, created_at
+SELECT id, name, status, deleted, created_at, reactor_id
 FROM device
 WHERE id = $1 AND deleted = false
 `
@@ -61,6 +63,7 @@ func (q *Queries) GetDevice(ctx context.Context, id int64) (Device, error) {
 		&i.Status,
 		&i.Deleted,
 		&i.CreatedAt,
+		&i.ReactorID,
 	)
 	return i, err
 }
@@ -93,7 +96,7 @@ func (q *Queries) GetDeviceStats(ctx context.Context) (GetDeviceStatsRow, error)
 }
 
 const listDevices = `-- name: ListDevices :many
-SELECT id, name, status, deleted, created_at
+SELECT id, name, status, deleted, created_at, reactor_id
 FROM device
 WHERE deleted = false
 ORDER BY created_at DESC
@@ -114,6 +117,7 @@ func (q *Queries) ListDevices(ctx context.Context) ([]Device, error) {
 			&i.Status,
 			&i.Deleted,
 			&i.CreatedAt,
+			&i.ReactorID,
 		); err != nil {
 			return nil, err
 		}
@@ -127,20 +131,27 @@ func (q *Queries) ListDevices(ctx context.Context) ([]Device, error) {
 
 const updateDevice = `-- name: UpdateDevice :one
 UPDATE device
-SET name   = COALESCE($1, name),
-    status = COALESCE($2, status)
-WHERE id = $3 AND deleted = false
-RETURNING id, name, status, deleted, created_at
+SET reactor_id   = COALESCE($1, reactor_id),
+    name   = COALESCE($2, name),
+    status = COALESCE($3, status)
+WHERE id = $4 AND deleted = false
+RETURNING id, name, status, deleted, created_at, reactor_id
 `
 
 type UpdateDeviceParams struct {
-	Name   pgtype.Text `json:"name"`
-	Status pgtype.Bool `json:"status"`
-	ID     int64       `json:"id"`
+	ReactorID pgtype.Int8 `json:"reactor_id"`
+	Name      pgtype.Text `json:"name"`
+	Status    pgtype.Bool `json:"status"`
+	ID        int64       `json:"id"`
 }
 
 func (q *Queries) UpdateDevice(ctx context.Context, arg UpdateDeviceParams) (Device, error) {
-	row := q.db.QueryRow(ctx, updateDevice, arg.Name, arg.Status, arg.ID)
+	row := q.db.QueryRow(ctx, updateDevice,
+		arg.ReactorID,
+		arg.Name,
+		arg.Status,
+		arg.ID,
+	)
 	var i Device
 	err := row.Scan(
 		&i.ID,
@@ -148,6 +159,7 @@ func (q *Queries) UpdateDevice(ctx context.Context, arg UpdateDeviceParams) (Dev
 		&i.Status,
 		&i.Deleted,
 		&i.CreatedAt,
+		&i.ReactorID,
 	)
 	return i, err
 }

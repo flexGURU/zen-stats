@@ -25,11 +25,10 @@ func NewReactorRepository(store *Store) *ReactorRepository {
 
 func (r *ReactorRepository) CreateReactor(ctx context.Context, reactor *repository.Reactor) (*repository.Reactor, error) {
 	createParams := generated.CreateReactorParams{
-		DeviceID: int64(reactor.DeviceID),
-		Name:     reactor.Name,
-		Status:   reactor.Status,
-		Pathway:  pgtype.Text{Valid: false},
-		PdfUrl:   pgtype.Text{Valid: false},
+		Name:    reactor.Name,
+		Status:  reactor.Status,
+		Pathway: pgtype.Text{Valid: false},
+		PdfUrl:  pgtype.Text{Valid: false},
 	}
 
 	if reactor.Pathway != "" {
@@ -61,17 +60,13 @@ func (r *ReactorRepository) GetReactorByID(ctx context.Context, id uint32) (*rep
 
 func (r *ReactorRepository) UpdateReactor(ctx context.Context, updateReactor *repository.UpdateReactor) error {
 	updateParams := generated.UpdateReactorParams{
-		ID:       int64(updateReactor.ID),
-		DeviceID: pgtype.Int8{Valid: false},
-		Name:     pgtype.Text{Valid: false},
-		Status:   pgtype.Text{Valid: false},
-		Pathway:  pgtype.Text{Valid: false},
-		PdfUrl:   pgtype.Text{Valid: false},
+		ID:      int64(updateReactor.ID),
+		Name:    pgtype.Text{Valid: false},
+		Status:  pgtype.Text{Valid: false},
+		Pathway: pgtype.Text{Valid: false},
+		PdfUrl:  pgtype.Text{Valid: false},
 	}
 
-	if updateReactor.DeviceID != nil {
-		updateParams.DeviceID = pgtype.Int8{Int64: int64(*updateReactor.DeviceID), Valid: true}
-	}
 	if updateReactor.Name != nil {
 		updateParams.Name = pgtype.Text{String: *updateReactor.Name, Valid: true}
 	}
@@ -95,25 +90,19 @@ func (r *ReactorRepository) UpdateReactor(ctx context.Context, updateReactor *re
 
 func (r *ReactorRepository) ListReactors(ctx context.Context, filter *repository.FilterReactors) ([]*repository.Reactor, *pkg.Pagination, error) {
 	listParams := generated.ListReactorsParams{
-		Limit:    int32(filter.Pagination.PageSize),
-		Offset:   pkg.Offset(filter.Pagination.Page, filter.Pagination.PageSize),
-		Search:   pgtype.Text{Valid: false},
-		DeviceID: pgtype.Int8{Valid: false},
-		Status:   pgtype.Text{Valid: false},
-		Pathway:  pgtype.Text{Valid: false},
+		Limit:   int32(filter.Pagination.PageSize),
+		Offset:  pkg.Offset(filter.Pagination.Page, filter.Pagination.PageSize),
+		Search:  pgtype.Text{Valid: false},
+		Status:  pgtype.Text{Valid: false},
+		Pathway: pgtype.Text{Valid: false},
 	}
 
 	countParams := generated.CountListReactorsParams{
-		Search:   pgtype.Text{Valid: false},
-		DeviceID: pgtype.Int8{Valid: false},
-		Status:   pgtype.Text{Valid: false},
-		Pathway:  pgtype.Text{Valid: false},
+		Search:  pgtype.Text{Valid: false},
+		Status:  pgtype.Text{Valid: false},
+		Pathway: pgtype.Text{Valid: false},
 	}
 
-	if filter.DeviceID != nil {
-		listParams.DeviceID = pgtype.Int8{Int64: int64(*filter.DeviceID), Valid: true}
-		countParams.DeviceID = pgtype.Int8{Int64: int64(*filter.DeviceID), Valid: true}
-	}
 	if filter.Search != nil {
 		search := strings.ToLower(*filter.Search)
 		listParams.Search = pgtype.Text{String: "%" + search + "%", Valid: true}
@@ -171,7 +160,6 @@ func mapDBReactorToReactor(dbReactor generated.Reactor) *repository.Reactor {
 
 	return &repository.Reactor{
 		ID:        uint32(dbReactor.ID),
-		DeviceID:  uint32(dbReactor.DeviceID),
 		Name:      dbReactor.Name,
 		Status:    string(dbReactor.Status),
 		Pathway:   pathway,

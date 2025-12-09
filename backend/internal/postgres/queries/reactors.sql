@@ -1,6 +1,6 @@
 -- name: CreateReactor :one
-INSERT INTO reactors (device_id, name, status, pathway, pdf_url)
-VALUES (sqlc.arg('device_id'), sqlc.arg('name'), sqlc.arg('status'), sqlc.narg('pathway'), sqlc.narg('pdf_url'))
+INSERT INTO reactors (name, status, pathway, pdf_url)
+VALUES (sqlc.arg('name'), sqlc.arg('status'), sqlc.narg('pathway'), sqlc.narg('pdf_url'))
 RETURNING *;
 
 -- name: GetReactorByID :one
@@ -9,8 +9,7 @@ WHERE id = $1 AND deleted_at IS NULL;
 
 -- name: UpdateReactor :exec
 UPDATE reactors
-SET device_id = coalesce(sqlc.narg('device_id'), device_id),
-    name = coalesce(sqlc.narg('name'), name),
+SET name = coalesce(sqlc.narg('name'), name),
     status = coalesce(sqlc.narg('status'), status),
     pathway = coalesce(sqlc.narg('pathway'), pathway),
     pdf_url = coalesce(sqlc.narg('pdf_url'), pdf_url)
@@ -19,10 +18,6 @@ WHERE id = sqlc.arg('id') AND deleted_at IS NULL;
 -- name: ListReactors :many
 SELECT * FROM reactors
 WHERE deleted_at IS NULL
-    AND (
-        sqlc.narg('device_id')::bigint IS NULL 
-        OR device_id = sqlc.narg('device_id')
-    )
     AND (
         COALESCE(sqlc.narg('search'), '') = '' 
         OR LOWER(name) LIKE sqlc.narg('search')
@@ -42,10 +37,6 @@ LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
 SELECT COUNT(*) AS total_reactors
 FROM reactors
 WHERE deleted_at IS NULL
-    AND (
-        sqlc.narg('device_id')::bigint IS NULL 
-        OR device_id = sqlc.narg('device_id')
-    )
     AND (
         COALESCE(sqlc.narg('search'), '') = '' 
         OR LOWER(name) LIKE sqlc.narg('search')

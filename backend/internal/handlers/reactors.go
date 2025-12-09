@@ -9,11 +9,10 @@ import (
 )
 
 type createReactorReq struct {
-	DeviceID uint32 `json:"deviceId" binding:"required"`
-	Name     string `json:"name" binding:"required"`
-	Status   string `json:"status" binding:"required,oneof=active inactive maintenance"`
-	Pathway  string `json:"pathway"`
-	PdfUrl   string `json:"pdfUrl"`
+	Name    string `json:"name" binding:"required"`
+	Status  string `json:"status" binding:"required,oneof=active inactive maintenance"`
+	Pathway string `json:"pathway"`
+	PdfUrl  string `json:"pdfUrl"`
 }
 
 func (s *Server) createReactor(ctx *gin.Context) {
@@ -24,11 +23,10 @@ func (s *Server) createReactor(ctx *gin.Context) {
 	}
 
 	reactor := &repository.Reactor{
-		DeviceID: req.DeviceID,
-		Name:     req.Name,
-		Status:   req.Status,
-		Pathway:  req.Pathway,
-		PdfUrl:   req.PdfUrl,
+		Name:    req.Name,
+		Status:  req.Status,
+		Pathway: req.Pathway,
+		PdfUrl:  req.PdfUrl,
 	}
 
 	createdReactor, err := s.repo.ReactorRepository.CreateReactor(ctx, reactor)
@@ -115,23 +113,13 @@ func (s *Server) listReactors(ctx *gin.Context) {
 			Page:     pageNo,
 			PageSize: pageSize,
 		},
-		Search:   nil,
-		DeviceID: nil,
-		Status:   nil,
-		Pathway:  nil,
+		Search:  nil,
+		Status:  nil,
+		Pathway: nil,
 	}
 
 	if search := ctx.Query("search"); search != "" {
 		filter.Search = &search
-	}
-	if deviceIDStr := ctx.Query("deviceId"); deviceIDStr != "" {
-		deviceID, err := pkg.StrToUint32(deviceIDStr)
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, err.Error())))
-
-			return
-		}
-		filter.DeviceID = &deviceID
 	}
 	if status := ctx.Query("status"); status != "" {
 		filter.Status = &status

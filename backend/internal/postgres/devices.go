@@ -27,8 +27,13 @@ func NewDeviceRepository(store *Store) *DeviceRepository {
 
 func (r *DeviceRepository) CreateDevice(ctx context.Context, device *repository.Device) (*repository.Device, error) {
 	arg := generated.CreateDeviceParams{
-		Name:   device.Name,
-		Status: device.Status,
+		ReactorID: pgtype.Int8{Valid: false},
+		Name:      device.Name,
+		Status:    device.Status,
+	}
+
+	if device.ReactorID != 0 {
+		arg.ReactorID = pgtype.Int8{Valid: true, Int64: int64(device.ReactorID)}
 	}
 
 	dbDevice, err := r.queries.CreateDevice(ctx, arg)
@@ -36,12 +41,7 @@ func (r *DeviceRepository) CreateDevice(ctx context.Context, device *repository.
 		return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to create device: %s", err.Error())
 	}
 
-	return &repository.Device{
-		ID:        uint32(dbDevice.ID),
-		Name:      dbDevice.Name,
-		Status:    dbDevice.Status,
-		CreatedAt: dbDevice.CreatedAt,
-	}, nil
+	return mapDBDeviceToDevice(dbDevice), nil
 }
 
 func (r *DeviceRepository) GetDeviceByID(ctx context.Context, id uint32) (*repository.Device, error) {
@@ -53,17 +53,22 @@ func (r *DeviceRepository) GetDeviceByID(ctx context.Context, id uint32) (*repos
 		return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to get device: %s", err.Error())
 	}
 
-	return &repository.Device{
-		ID:        uint32(dbDevice.ID),
-		Name:      dbDevice.Name,
-		Status:    dbDevice.Status,
-		CreatedAt: dbDevice.CreatedAt,
-	}, nil
+	return mapDBDeviceToDevice(dbDevice), nil
 }
 
 func (r *DeviceRepository) UpdateDevice(ctx context.Context, id uint32, update *repository.DeviceUpdate) (*repository.Device, error) {
 	params := generated.UpdateDeviceParams{
-		ID: int64(id),
+		ID:        int64(id),
+		ReactorID: pgtype.Int8{Valid: false},
+		Name:      pgtype.Text{Valid: false},
+		Status:    pgtype.Bool{Valid: false},
+	}
+
+	if update.ReactorID != nil {
+		params.ReactorID = pgtype.Int8{
+			Int64: int64(*update.ReactorID),
+			Valid: true,
+		}
 	}
 
 	if update.Name != nil {
@@ -88,12 +93,7 @@ func (r *DeviceRepository) UpdateDevice(ctx context.Context, id uint32, update *
 		return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to update device: %s", err.Error())
 	}
 
-	return &repository.Device{
-		ID:        uint32(dbDevice.ID),
-		Name:      dbDevice.Name,
-		Status:    dbDevice.Status,
-		CreatedAt: dbDevice.CreatedAt,
-	}, nil
+	return mapDBDeviceToDevice(dbDevice), nil
 }
 
 func (r *DeviceRepository) DeleteDevice(ctx context.Context, id uint32) error {
@@ -116,12 +116,7 @@ func (r *DeviceRepository) ListDevice(ctx context.Context) ([]*repository.Device
 
 	devices := make([]*repository.Device, 0, len(dbDevices))
 	for _, dbDevice := range dbDevices {
-		devices = append(devices, &repository.Device{
-			ID:        uint32(dbDevice.ID),
-			Name:      dbDevice.Name,
-			Status:    dbDevice.Status,
-			CreatedAt: dbDevice.CreatedAt,
-		})
+		devices = append(devices, mapDBDeviceToDevice(dbDevice))
 	}
 
 	return devices, nil
@@ -139,4 +134,19 @@ func (r *DeviceRepository) GetDeviceStats(ctx context.Context) (*repository.Devi
 		InactiveDevices:     stats.InactiveDevices,
 		TotalSensorReadings: stats.TotalSensorReadings,
 	}, nil
+}
+
+func mapDBDeviceToDevice(dbDevice generated.Device) *repository.Device {
+	var reactorID uint32
+	if dbDevice.ReactorID.Valid {
+		reactorID = uint32(dbDevice.ReactorID.Int64)
+	}
+
+	return &repository.Device{
+		ID:        uint32(dbDevice.ID),
+		ReactorID: reactorID,
+		Name:      dbDevice.Name,
+		Status:    dbDevice.Status,
+		CreatedAt: dbDevice.CreatedAt,
+	}
 }

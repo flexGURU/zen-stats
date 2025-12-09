@@ -11,13 +11,15 @@ import (
 type Device struct {
 	ID        uint32    `json:"id"`
 	Name      string    `json:"name"`
+	ReactorID uint32    `json:"reactor_id"`
 	Status    bool      `json:"status"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
 type DeviceUpdate struct {
-	Name   *string `json:"name"`
-	Status *bool   `json:"status"`
+	ReactorID *uint32 `json:"reactor_id"`
+	Name      *string `json:"name"`
+	Status    *bool   `json:"status"`
 }
 
 // SENSOR READINGS
@@ -74,9 +76,3 @@ type DeviceStats struct {
 	InactiveDevices     int64 `json:"inactive_devices"`
 	TotalSensorReadings int64 `json:"total_sensor_readings"`
 }
-
-// type DeviceFilter struct {
-// 	Pagination *pkg.Pagination
-// 	Search     *string
-// 	Status     *string // "active", "inactive", etc.
-// }
