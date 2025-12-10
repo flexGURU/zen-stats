@@ -105,13 +105,23 @@ func StrToTime(s string) (time.Time, error) {
 		return time.Now(), nil
 	}
 
-	t, err := time.Parse(timeFormat, s)
-	if err != nil {
-		log.Println("not time")
-		return time.Now(), err
+	layouts := []string{
+		"2006-01-02",
+		"2006-01-02T15:04:05Z",
+		"2006-01-02T15:04:05Z07:00",
 	}
 
-	return t, nil
+	var parsed time.Time
+	var err error
+
+	for _, layout := range layouts {
+		parsed, err = time.Parse(layout, s)
+		if err == nil {
+			return parsed, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("invalid date format: %s", s)
 }
 
 func StrToDate(s string) (time.Time, error) {
@@ -119,13 +129,23 @@ func StrToDate(s string) (time.Time, error) {
 		return time.Now(), nil
 	}
 
-	t, err := time.Parse(dateFormat, s)
-	if err != nil {
-		log.Println("not time")
-		return time.Now(), err
+	layouts := []string{
+		"2006-01-02",
+		"2006-01-02T15:04:05Z",
+		"2006-01-02T15:04:05Z07:00",
 	}
 
-	return t, nil
+	var parsed time.Time
+	var err error
+
+	for _, layout := range layouts {
+		parsed, err = time.Parse(layout, s)
+		if err == nil {
+			return parsed, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("invalid date format: %s", s)
 }
 
 func StrToBool(s string) bool {
