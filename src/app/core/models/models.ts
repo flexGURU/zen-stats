@@ -31,7 +31,6 @@ export interface Reactor {
   status: 'Active' | 'Inactive';
   pdfUrl: string;
   pathway: 'Gaseous' | 'Carbonated' | 'Liquid';
-  deviceId: string | number;
 }
 
 export interface User {

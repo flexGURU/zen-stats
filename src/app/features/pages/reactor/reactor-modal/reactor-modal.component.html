@@ -22,29 +22,7 @@
     <small class="text-red-600">Reactor Name is required.</small>
     } }
   </div>
-  <div class="mb-4">
-    <label
-      for="reactorName"
-      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
-    >
-      ID
-    </label>
 
-    <input
-      pInputText
-      id="reactorId"
-      formControlName="reactorId"
-      class="w-full border border-gray-300 rounded-md p-2"
-      placeholder="Enter reactor ID"
-      type="text"
-    />
-
-    @if (formControls['reactorId'].invalid && (formControls['reactorId'].dirty
-    || formControls['reactorId'].touched)) { @if
-    (formControls['reactorId'].errors?.['required']) {
-    <small class="text-red-600">Reactor ID is required.</small>
-    } }
-  </div>
   <div class="mb-4">
     <label
       for="reactorStatus"
@@ -110,11 +88,6 @@
       accept=".pdf"
       [maxFileSize]="10000000"
     ></p-fileUpload>
-    @if (formControls['status'].invalid && (formControls['status'].dirty ||
-    formControls['status'].touched)) { @if
-    (formControls['status'].errors?.['required']) {
-    <small class="text-red-600">Reactor Status is required.</small>
-    } }
   </div>
 
   <button
@@ -122,5 +95,6 @@
     type="submit"
     label="Submit"
     [disabled]="reactorForm.invalid"
+    [loading]="loading()"
   ></button>
 </form>

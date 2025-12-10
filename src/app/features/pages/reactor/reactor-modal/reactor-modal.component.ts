@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, input, model, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormsModule,
@@ -13,6 +21,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { Reactor } from '../../../../core/models/models';
 import { ReactorService } from '../reactor.service';
+import { finalize } from 'rxjs';
+import { Chip } from 'primeng/chip';
 
 @Component({
   selector: 'app-reactor-modal',
@@ -24,6 +34,7 @@ import { ReactorService } from '../reactor.service';
     CommonModule,
     SelectModule,
     FileUpload,
+    CommonModule,
   ],
   templateUrl: './reactor-modal.component.html',
   styles: ``,
@@ -34,9 +45,11 @@ export class ReactorModalComponent {
   visible = model(false);
   isEditMode = model(false);
   reactorData = input<Reactor | null>(null);
+  loading = signal(false);
 
   private fb = inject(FormBuilder);
   private reactorService = inject(ReactorService);
+  mutationStatus = output<Record<string, boolean | string>>();
 
   statusOptions = signal([
     { label: 'Active', value: 'active' },
@@ -65,17 +78,15 @@ export class ReactorModalComponent {
   initialiseForm() {
     this.reactorForm = this.fb.group({
       name: ['', Validators.required],
-      reactorId: ['', Validators.required],
       status: ['', Validators.required],
       pathway: ['', Validators.required],
-      pdfUrl: ['', Validators.required],
+      pdfUrl: [''],
     });
   }
 
   populateForm() {
     this.reactorForm.patchValue({
       name: this.reactorData()?.name,
-      reactorId: this.reactorData()?.id,
       pathway: this.reactorData()?.pathway,
       pdfUrl: this.reactorData()?.pdfUrl,
       status: this.reactorData()?.status,
@@ -87,12 +98,60 @@ export class ReactorModalComponent {
 
   onSubmit() {
     if (this.reactorForm.invalid) return;
+    const reactor: Reactor = this.reactorForm.getRawValue();
+
+    this.reactorData()
+      ? this.updateReactor(reactor)
+      : this.createReactor(reactor);
   }
 
-  createReactor() {
-    
+  createReactor(reactor: Reactor) {
+    this.reactorService
+      .createReactor(reactor)
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.mutationStatus.emit({
+            status: true,
+            detail: 'Reactor updated successfully',
+          });
+        },
+        error: () => {
+          this.mutationStatus.emit({
+            status: false,
+            detail: 'Error updating reactor',
+          });
+        },
+      });
   }
-  updateReactor() {}
+  updateReactor(reactor: Reactor) {
+    this.reactorService
+      .updateReactor(this.reactorData()!.id, reactor)
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.mutationStatus.emit({
+            status: true,
+            detail: 'Reactor updated successfully',
+          });
+        },
+        error: () => {
+          this.mutationStatus.emit({
+            status: false,
+            detail: 'Error updating reactor',
+          });
+        },
+      });
+  }
+
   onFileSelect(event: any, fieldName: string) {
     const file = event.files[0];
     this.reactorForm.patchValue({ [fieldName]: file });

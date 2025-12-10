@@ -18,6 +18,7 @@ import notificationResponse from '../../../core/utils/notification';
 import { DeviceService } from './device.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { finalize } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-device',
@@ -32,8 +33,9 @@ import { finalize } from 'rxjs';
     Dialog,
     DeviceModalComponent,
     Toast,
-    ConfirmDialog
-],
+    ConfirmDialog,
+    CommonModule,
+  ],
   templateUrl: './device.component.html',
   providers: [MessageService, ConfirmationService],
 })
