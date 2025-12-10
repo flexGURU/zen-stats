@@ -10,6 +10,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DatePicker, DatePickerModule } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { batchExperimentQuery } from './batch-experiment.query';
+import { BatchExperiment } from '../../../core/models/models';
+import { BatchExperimentService } from './batch-experiment.service';
 
 @Component({
   selector: 'app-batch-experiment',
@@ -36,25 +39,26 @@ export class BatchExperimentComponent {
   messageService = inject(MessageService);
   datePlacehHolder = new Date();
   todaysDate = this.datePlacehHolder.toLocaleDateString();
+  selectedExperiment = signal<BatchExperiment | null>(null);
 
   batchId = signal('');
   reactorName = signal('');
   date = signal('');
 
-  batchExperiments = [
-    { id: 1, name: 'Experiment 1', status: 'Running' },
-    { id: 2, name: 'Experiment 2', status: 'Completed' },
-    { id: 3, name: 'Experiment 3', status: 'Failed' },
-  ];
+  batchExperiments = batchExperimentQuery().batchExperimentData;
+  private batchExperimentService = inject(BatchExperimentService);
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      if (!this.displayModal()) {
+        this.selectedExperiment.set(null);
+      }
+    });
+  }
 
-  editBatchExperiment = (experiment: {
-    id: number;
-    name: string;
-    status: string;
-  }) => {
+  editBatchExperiment = (experiment: BatchExperiment) => {
     this.isEditMode.set(true);
+    this.selectedExperiment.set(experiment);
     this.displayModal.set(true);
   };
 
@@ -83,12 +87,51 @@ export class BatchExperimentComponent {
         label: 'Delete',
       },
       accept: () => {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Confirmed',
-          detail: 'You have accepted',
-        });
+        this.triggerDelete(experimentId);
       },
     });
   };
+
+  triggerDelete(experimentId: number | string) {
+    this.batchExperimentService.deleteBatchExperiment(experimentId).subscribe({
+      next: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Deleted',
+          detail: 'Experiment deleted successfully',
+        });
+        this.batchExperiments.refetch();
+      },
+      error: (error) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to delete experiment',
+        });
+      },
+    });
+  }
+
+  onMutateExperiment(event: Record<string, boolean | string>) {
+    event['status']
+      ? this.handleSuccess(event['detail'])
+      : this.handleError(event['detail']);
+  }
+  handleSuccess(detail: string | boolean) {
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Success',
+      detail: detail as string,
+    });
+
+    this.displayModal.set(false);
+    this.batchExperiments.refetch();
+  }
+  handleError(detail: string | boolean = false) {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: detail ? (detail as string) : 'Error creating experiment',
+    });
+  }
 }

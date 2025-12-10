@@ -34,12 +34,11 @@
     <p-select
       formControlName="status"
       class="w-full"
-      focusOnHover="true"
-      selectOnFocus="true"
       appendTo="body"
-      checkmark="true"
       [options]="statusOptions()"
       placeholder="Select status"
+      checkmark="true"
+      focusOnHover="true"
     />
     @if (formControls['status'].invalid && (formControls['status'].dirty ||
     formControls['status'].touched)) { @if
@@ -60,7 +59,6 @@
       formControlName="pathway"
       class="w-full"
       focusOnHover="true"
-      selectOnFocus="true"
       appendTo="body"
       checkmark="true"
       [options]="pathwayOptions()"
@@ -73,13 +71,28 @@
     } }
   </div>
   <div class="mb-4">
-    <label
-      for="reactorStatus"
-      class="block text-sm font-medium text-gray-700 ml-2 mb-2"
-    >
-      PDF Upload
-    </label>
-
+    @if (reactorData?.pdfUrl) {
+    <div class="flex items-center gap-3 border border-gray-300 rounded-md p-3">
+      <p-tag icon="pi pi-external-link" severity="info">
+        <a
+          href="{{ reactorData?.pdfUrl }}"
+          class="hover:underline"
+          target="_blank"
+          >Reactor File</a
+        > </p-tag
+      ><button
+        pButton
+        severity="warn"
+        size="small"
+        icon="pi pi-times"
+        (click)="removeFile()"
+        [loading]="removeLoading()"
+        type="button"
+      >
+        Remove
+      </button>
+    </div>
+    } @else {
     <p-fileUpload
       mode="advanced"
       chooseLabel="Pdf"
@@ -88,6 +101,7 @@
       accept=".pdf"
       [maxFileSize]="10000000"
     ></p-fileUpload>
+    }
   </div>
 
   <button

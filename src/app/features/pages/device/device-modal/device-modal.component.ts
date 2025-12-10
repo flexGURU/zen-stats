@@ -2,6 +2,7 @@ import {
   Component,
   effect,
   inject,
+  Input,
   input,
   output,
   signal,
@@ -27,11 +28,11 @@ import { finalize } from 'rxjs';
 })
 export class DeviceModalComponent {
   deviceForm!: FormGroup;
-  deviceData = input<Device | null>(null);
+  @Input() deviceData: Device | null = null;
   mutationStatus = output<Record<string, boolean | string>>();
   statusOptions = signal([
-    { label: 'Active', value: true },
-    { label: 'Inactive', value: false },
+    { label: 'Active', value: 'active' },
+    { label: 'Inactive', value: 'inactive' },
   ]);
   loading = signal(false);
 
@@ -39,23 +40,32 @@ export class DeviceModalComponent {
   private deviceService = inject(DeviceService);
 
   constructor() {
-    this.initiliaseForm();
-    effect(() => {
-      this.deviceData() ? this.populateForm() : this.initiliaseForm();
-    });
+    this.initializeForm();
+  }
+  ngOnChanges() {
+    const data = this.deviceData;
+    if (data) {
+      this.populateForm();
+    } else {
+      this.deviceForm.reset();
+    }
   }
 
-  initiliaseForm() {
+  initializeForm() {
     this.deviceForm = this.fb.group({
       name: ['', Validators.required],
-      status: [null, Validators.required],
+      status: ['', Validators.required],
     });
   }
   populateForm() {
-    this.deviceForm.patchValue({
-      name: this.deviceData()?.name,
-      status: this.deviceData()?.status,
-    });
+    if (this.deviceData) {
+      this.deviceForm.patchValue({
+        name: this.deviceData!.name,
+        status: this.deviceData!.status ? 'active' : 'inactive',
+      });
+    } else {
+      this.deviceForm.reset();
+    }
   }
 
   get formControls() {
@@ -69,13 +79,13 @@ export class DeviceModalComponent {
 
     const devicePayload: Partial<Device> = {
       name,
-      status,
+      status: status === 'active',
     };
 
     this.loading.set(true);
 
-    this.deviceData()
-      ? this.updateDevice(this.deviceData()!.id, devicePayload)
+    this.deviceData
+      ? this.updateDevice(this.deviceData!.id, devicePayload)
       : this.createDevice(devicePayload);
   }
 
@@ -100,20 +110,23 @@ export class DeviceModalComponent {
       });
   }
   updateDevice(deviceId: string | number, device: Partial<Device>) {
-    this.deviceService.updateDevice(deviceId, device).subscribe({
-      next: () => {
-        this.mutationStatus.emit({
-          status: true,
-          detail: 'Device updated successfully',
-        });
-      },
-      error: (error) => {
-        console.error('Error updating device:', error);
-        this.mutationStatus.emit({
-          status: false,
-          detail: 'Error updating device',
-        });
-      },
-    });
+    this.deviceService
+      .updateDevice(deviceId, device)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: () => {
+          this.mutationStatus.emit({
+            status: true,
+            detail: 'Device updated successfully',
+          });
+        },
+        error: (error) => {
+          console.error('Error updating device:', error);
+          this.mutationStatus.emit({
+            status: false,
+            detail: 'Error updating device',
+          });
+        },
+      });
   }
 }

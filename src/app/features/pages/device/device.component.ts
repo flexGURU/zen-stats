@@ -19,6 +19,9 @@ import { DeviceService } from './device.service';
 import { ConfirmDialog } from 'primeng/confirmdialog';
 import { finalize } from 'rxjs';
 import { CommonModule } from '@angular/common';
+import { TagModule } from 'primeng/tag';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-device',
@@ -35,6 +38,9 @@ import { CommonModule } from '@angular/common';
     Toast,
     ConfirmDialog,
     CommonModule,
+    TagModule,
+    FormsModule,
+    InputTextModule,
   ],
   templateUrl: './device.component.html',
   providers: [MessageService, ConfirmationService],
@@ -45,6 +51,9 @@ export class DeviceComponent {
   displayModal = signal(false);
   deleteLoading = signal(false);
   handleResponse = notificationResponse;
+
+  deviceName = signal('');
+  status = signal<'active' | 'inactive' | ''>('');
 
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
@@ -112,5 +121,12 @@ export class DeviceComponent {
       summary: 'Error',
       detail: detail ? (detail as string) : 'Error creating device',
     });
+  }
+
+  applyFilters() {}
+
+  clearFilters() {
+    this.deviceName.set('');
+    this.status.set('');
   }
 }

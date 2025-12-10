@@ -3,6 +3,7 @@ import {
   Component,
   effect,
   inject,
+  Input,
   input,
   model,
   output,
@@ -23,6 +24,8 @@ import { Reactor } from '../../../../core/models/models';
 import { ReactorService } from '../reactor.service';
 import { finalize } from 'rxjs';
 import { Chip } from 'primeng/chip';
+import { FirebaseService } from '../../../../core/services/firebase.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-reactor-modal',
@@ -35,6 +38,7 @@ import { Chip } from 'primeng/chip';
     SelectModule,
     FileUpload,
     CommonModule,
+    TagModule,
   ],
   templateUrl: './reactor-modal.component.html',
   styles: ``,
@@ -44,11 +48,15 @@ export class ReactorModalComponent {
 
   visible = model(false);
   isEditMode = model(false);
-  reactorData = input<Reactor | null>(null);
+  selectedFile = signal<File | null>(null);
+  @Input() reactorData: Reactor | null = null;
+
   loading = signal(false);
+  removeLoading = signal(false);
 
   private fb = inject(FormBuilder);
   private reactorService = inject(ReactorService);
+  private firebaseService = inject(FirebaseService);
   mutationStatus = output<Record<string, boolean | string>>();
 
   statusOptions = signal([
@@ -63,16 +71,7 @@ export class ReactorModalComponent {
 
   constructor() {
     this.initialiseForm();
-    this.populateForm();
-    effect(() => {
-      if (!this.visible()) {
-        this.reactorForm.reset();
-      }
-    });
-
-    effect(() => {
-      this.populateForm();
-    });
+    effect(() => {});
   }
 
   initialiseForm() {
@@ -84,23 +83,48 @@ export class ReactorModalComponent {
     });
   }
 
+  ngOnChanges() {
+    if (this.reactorData) {
+      this.populateForm();
+    } else {
+      this.reactorForm.reset();
+    }
+  }
+
   populateForm() {
     this.reactorForm.patchValue({
-      name: this.reactorData()?.name,
-      pathway: this.reactorData()?.pathway,
-      pdfUrl: this.reactorData()?.pdfUrl,
-      status: this.reactorData()?.status,
+      name: this.reactorData?.name,
+      pathway: this.reactorData?.pathway,
+      pdfUrl: this.reactorData?.pdfUrl,
+      status: this.reactorData?.status,
     });
   }
   get formControls() {
     return this.reactorForm.controls;
   }
 
-  onSubmit() {
+  async onSubmit() {
     if (this.reactorForm.invalid) return;
     const reactor: Reactor = this.reactorForm.getRawValue();
+    this.loading.set(true);
 
-    this.reactorData()
+    try {
+      if (this.selectedFile()) {
+        const imageUrl = await this.firebaseService.uploadImage(
+          this.selectedFile()!
+        );
+        reactor.pdfUrl = imageUrl;
+      }
+    } catch (error) {
+      this.loading.set(false);
+      this.mutationStatus.emit({
+        status: false,
+        detail: 'Error uploading file',
+      });
+      return;
+    }
+
+    this.reactorData
       ? this.updateReactor(reactor)
       : this.createReactor(reactor);
   }
@@ -117,20 +141,20 @@ export class ReactorModalComponent {
         next: () => {
           this.mutationStatus.emit({
             status: true,
-            detail: 'Reactor updated successfully',
+            detail: 'Reactor created successfully',
           });
         },
         error: () => {
           this.mutationStatus.emit({
             status: false,
-            detail: 'Error updating reactor',
+            detail: 'Error creating reactor',
           });
         },
       });
   }
   updateReactor(reactor: Reactor) {
     this.reactorService
-      .updateReactor(this.reactorData()!.id, reactor)
+      .updateReactor(this.reactorData!.id, reactor)
       .pipe(
         finalize(() => {
           this.loading.set(false);
@@ -154,6 +178,47 @@ export class ReactorModalComponent {
 
   onFileSelect(event: any, fieldName: string) {
     const file = event.files[0];
-    this.reactorForm.patchValue({ [fieldName]: file });
+    this.selectedFile.set(file);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.reactorForm.patchValue({
+        [fieldName]: reader.result,
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  removeFile() {
+    this.removeLoading.set(true);
+    this.firebaseService
+      .removeImage(this.reactorData?.pdfUrl!)
+      .pipe(
+        finalize(() => {
+          this.removeLoading.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          if (this.reactorData) {
+            this.reactorData.pdfUrl = '';
+            this.reactorForm.patchValue({ pdfUrl: '' });
+            this.reactorService
+              .updateReactor(this.reactorData.id, this.reactorData)
+              .subscribe();
+          }
+          this.selectedFile.set(null);
+        },
+        error: () => {
+          this.mutationStatus.emit({
+            status: false,
+            detail: 'Error removing file',
+          });
+        },
+      });
+  }
+
+  ngOnDestroy() {
+    this.reactorForm.reset();
   }
 }

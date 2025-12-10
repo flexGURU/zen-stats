@@ -1,15 +1,5 @@
 <div class="max-w-5xl mx-auto px-4 py-6 md:py-10 lg:py-16">
-  @if (devices.isLoading()) {
-  <div class="flex flex-col justify-center items-center">
-    <p-progress-spinner
-      strokeWidth="4"
-      fill="transparent"
-      animationDuration=".5s"
-      ariaLabel="Loading Zen Stats"
-    />
-    <span>Loading Devices</span>
-  </div>
-  } @else if (devices.isError()) {
+  @if (devices.isError()) {
   <div class="flex flex-col justify-center items-center">
     <p-message severity="error"
       >Error loading . Please try again.
@@ -22,30 +12,85 @@
       ></p-button
     ></p-message>
   </div>
-  } @else if (devices.data()?.length) {
+  }
   <div>
-    <div class="flex flex-col md:flex-row justify-between px-2">
-      <div>
-        <h1 class="text-3xl font-bold mb-4">Devices</h1>
+    <div class="flex justify-between">
+      <h1 class="text-3xl font-bold mb-4">Devices</h1>
+      <button
+        (click)="displayModal.set(true)"
+        pButton
+        type="button"
+        label="Add Device"
+        icon="pi pi-plus"
+        class="mb-4"
+      ></button>
+    </div>
+    <div
+      class="flex flex-col md:flex-row items-center justify-between px-2 mb-1"
+    >
+      <div class="flex flex-col md:flex-row gap-2">
+        <div>
+          <label
+            for="deviceName"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Device Name
+          </label>
+          <input
+            pInputText
+            id="deviceName"
+            [(ngModel)]="deviceName"
+            class="w-full"
+            placeholder="Device Name"
+            type="text"
+            pSize="small"
+          />
+        </div>
+        <div>
+          <label
+            for="deviceName"
+            class="block text-sm font-medium text-gray-700 mb-2"
+          >
+            Status
+          </label>
+          <input
+            pInputText
+            id="status"
+            [(ngModel)]="status"
+            class="w-full"
+            placeholder="Status"
+            type="text"
+            pSize="small"
+          />
+        </div>
       </div>
-      <div>
+      <div class="h-full flex gap-2 justify-end items-center">
         <button
-          (click)="displayModal.set(true)"
+          pButton
+          icon="pi pi-refresh"
+          size="small"
+          (click)="devices.refetch()"
+          [loading]="devices.isLoading()"
+        ></button>
+
+        <button
+          (click)="clearFilters()"
           pButton
           type="button"
-          label="Add Device"
-          icon="pi pi-plus"
-          class="mb-4"
+          label="Clear Filters"
+          icon="pi pi-times"
+          size="small"
         ></button>
       </div>
     </div>
 
     <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
       <p-table
-        [value]="devices.data() ?? []"
+        [value]="devices.data() || []"
         dataKey="id"
         size="small"
         [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
+        [loading]="devices.isLoading()"
       >
         <ng-template #header>
           <tr>
@@ -58,16 +103,28 @@
           <tr [pSelectableRow]="device">
             <td>{{ device.name }}</td>
             <td>
-              <span
-              class="inline-block px-2 py-0.5 text-xs font-semibold rounded-full"
-              [ngClass]="{
-                'bg-green-100 text-green-800': device.status === true,
-                'bg-red-100 text-red-800': device.status === false,
-                'bg-gray-100 text-gray-800': device.status !== true && device.status !== false
-              }"
-              >
-              {{ device.status === true ? 'active' : device.status === false ? 'inactive' : device.status }}
-              </span>
+              <p-tag
+                rounded="true"
+                [icon]="
+                  device.status === true
+                    ? 'pi pi-check'
+                    : 'pi pi-exclamation-triangle'
+                "
+                [value]="
+                  device.status === true
+                    ? 'Active'
+                    : device.status === false
+                    ? 'Inactive'
+                    : device.status
+                "
+                [severity]="
+                  device.status === true
+                    ? 'success'
+                    : device.status === false
+                    ? 'danger'
+                    : 'warn'
+                "
+              ></p-tag>
             </td>
             <td>
               <button
@@ -101,6 +158,7 @@
                   label="Refresh"
                   icon="pi pi-refresh"
                   size="small"
+                  (click)="devices.refetch()"
                 ></button>
               </span>
             </td>
@@ -109,7 +167,6 @@
       </p-table>
     </div>
   </div>
-  }
 </div>
 <p-dialog
   maskStyleClass="backdrop-blur-sm"
