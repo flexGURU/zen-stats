@@ -24,25 +24,27 @@ type DeviceUpdate struct {
 
 // SENSOR READINGS
 type Reading struct {
-	ID        uint32         `json:"id"`
-	DeviceID  uint32         `json:"device_id"`
-	Payload   ReadingPayload `json:"payload"` // jsonb
-	Timestamp time.Time      `json:"timestamp"`
+	ID        uint32    `json:"id"`
+	DeviceID  uint32    `json:"device_id"`
+	Payload   any       `json:"payload"` // jsonb
+	Timestamp time.Time `json:"timestamp"`
 }
 
-type ReadingPayload struct {
-	CO2      *float64 `json:"co2"`
-	Pressure *float64 `json:"pressure"`
-	Temp     *float64 `json:"temperature"`
-	ServerTS string   `json:"server_timestamp" binding:"required"`
-}
+// type ReadingPayload struct {
+// 	CO2       *float64 `json:"co2"`
+// 	Pressure  *float64 `json:"pressure"`
+// 	Temp      *float64 `json:"temperature1"`
+// 	Temp2     *float64 `json:"temperature2"`
+// 	ServerTS  string   `json:"ServerTS"`
+// 	Timestamp string   `json:"timestamp"`
+// }
 
-func (rp *ReadingPayload) Validate() error {
-	if rp.CO2 == nil && rp.Pressure == nil && rp.Temp == nil {
-		return pkg.Errorf(pkg.INVALID_ERROR, "at least one sensor reading must be provided")
-	}
-	return nil
-}
+// func (rp *ReadingPayload) Validate() error {
+// 	if rp.CO2 == nil && rp.Pressure == nil && rp.Temp == nil {
+// 		return pkg.Errorf(pkg.INVALID_ERROR, "at least one sensor reading must be provided")
+// 	}
+// 	return nil
+// }
 
 type ReadingFilter struct {
 	DeviceID   uint32

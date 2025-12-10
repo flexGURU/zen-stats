@@ -10,7 +10,7 @@ import (
 )
 
 func (s *Server) createSensorReadingHandler(ctx *gin.Context) {
-	var req repository.ReadingPayload
+	var req any
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(pkg.Errorf(pkg.INVALID_ERROR, err.Error())))
 		return

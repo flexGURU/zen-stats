@@ -9,12 +9,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const (
-	dateFormat = "2006-01-02"
-	// timeFormat = "15:04"
-	timeFormat = "2006-01-02T15:04:05Z07:00"
-)
-
 func PgTypeNumericToFloat64(n pgtype.Numeric) float64 {
 	f, err := n.Float64Value()
 	if err != nil {

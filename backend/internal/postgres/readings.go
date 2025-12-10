@@ -13,9 +13,9 @@ import (
 )
 
 func (r *DeviceRepository) AddReading(ctx context.Context, reading *repository.Reading) (*repository.Reading, error) {
-	if err := reading.Payload.Validate(); err != nil {
-		return nil, err
-	}
+	// if err := reading.Payload.Validate(); err != nil {
+	// 	return nil, err
+	// }
 
 	payloadBytes, err := json.Marshal(reading.Payload)
 	if err != nil {
@@ -31,7 +31,7 @@ func (r *DeviceRepository) AddReading(ctx context.Context, reading *repository.R
 		return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to add reading: %s", err.Error())
 	}
 
-	var payload repository.ReadingPayload
+	var payload any
 	if len(dbReading.Payload) > 0 {
 		if err := json.Unmarshal(dbReading.Payload, &payload); err != nil {
 			return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to unmarshal reading payload: %s", err.Error())
@@ -55,7 +55,7 @@ func (r *DeviceRepository) GetReadingByID(ctx context.Context, id uint32) (*repo
 		return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to get reading: %s", err.Error())
 	}
 
-	var payload repository.ReadingPayload
+	var payload any
 	if len(dbReading.Payload) > 0 {
 		if err := json.Unmarshal(dbReading.Payload, &payload); err != nil {
 			return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to unmarshal reading payload: %s", err.Error())
@@ -84,7 +84,7 @@ func (r *DeviceRepository) ListReadingByDevice(ctx context.Context, filter *repo
 
 	readings := make([]*repository.Reading, 0, len(dbReadings))
 	for _, dbReading := range dbReadings {
-		var payload repository.ReadingPayload
+		var payload any
 		if len(dbReading.Payload) > 0 {
 			if err := json.Unmarshal(dbReading.Payload, &payload); err != nil {
 				return nil, nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to unmarshal reading payload: %s", err.Error())
@@ -121,7 +121,7 @@ func (r *DeviceRepository) ListReadingByDate(ctx context.Context, filter *reposi
 
 	readings := make([]*repository.Reading, 0, len(dbReadings))
 	for _, dbReading := range dbReadings {
-		var payload repository.ReadingPayload
+		var payload any
 		if len(dbReading.Payload) > 0 {
 			if err := json.Unmarshal(dbReading.Payload, &payload); err != nil {
 				return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to unmarshal reading payload: %s", err.Error())
@@ -157,7 +157,7 @@ func (r *DeviceRepository) ListReadingByTimeRange(ctx context.Context, filter *r
 
 	readings := make([]*repository.Reading, 0, len(dbReadings))
 	for _, dbReading := range dbReadings {
-		var payload repository.ReadingPayload
+		var payload any
 		if len(dbReading.Payload) > 0 {
 			if err := json.Unmarshal(dbReading.Payload, &payload); err != nil {
 				return nil, pkg.Errorf(pkg.INTERNAL_ERROR, "failed to unmarshal reading payload: %s", err.Error())
