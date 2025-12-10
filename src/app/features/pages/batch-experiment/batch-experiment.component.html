@@ -3,9 +3,6 @@
     <div class="flex flex-col md:flex-row justify-between px-2">
       <div>
         <h1 class="text-3xl font-bold mb-4">Batch Experiments</h1>
-        <p class="text-gray-600 mb-6">
-          Manage and monitor your batch experiments
-        </p>
       </div>
 
       <div>
@@ -70,7 +67,15 @@
           size="small"
         />
       </div>
-      <div class="h-full flex justify-end items-end">
+      <div class="h-full flex gap-2 justify-end items-end">
+        <button
+          pButton
+          icon="pi pi-refresh"
+          size="small"
+          (click)="batchExperiments.refetch()"
+          [loading]="batchExperiments.isLoading()"
+        ></button>
+
         <button
           (click)="clearFilters()"
           pButton
@@ -82,34 +87,41 @@
       </div>
     </div>
   </div>
+
   <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
     <p-table
-      [value]="batchExperiments"
+      [value]="batchExperiments.data() || []"
       dataKey="id"
       [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
       size="small"
+      [loading]="batchExperiments.isLoading()"
     >
       <ng-template #header>
         <tr>
-          <th>Name</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th>Batch ID</th>
+          <th>Operator</th>
+          <th>Reactor ID</th>
+          <th>Block ID</th>
+          <th>Date</th>
         </tr>
       </ng-template>
-      <ng-template #body let-reactor>
-        <tr [pSelectableRow]="reactor">
-          <td>{{ reactor.name }}</td>
-          <td>{{ reactor.status }}</td>
+      <ng-template #body let-experiment>
+        <tr [pSelectableRow]="experiment">
+          <td>{{ experiment.batchId }}</td>
+          <td>{{ experiment.operator }}</td>
+          <td>{{ experiment.reactorId }}</td>
+          <td>{{ experiment.blockId }}</td>
+          <td>{{ experiment.date | date : "mediumDate" }}</td>
           <td>
             <button
-              (click)="editBatchExperiment(reactor)"
+              (click)="editBatchExperiment(experiment)"
               pButton
               type="button"
               class="p-button-text"
               icon="pi pi-pencil"
             ></button>
             <button
-              (click)="deleteBatchExperiment(reactor.id)"
+              (click)="deleteBatchExperiment(experiment.id)"
               pButton
               type="button"
               class="p-button-text"
@@ -130,6 +142,8 @@
                 label="Refresh"
                 icon="pi pi-refresh"
                 size="small"
+                [loading]="batchExperiments.isLoading()"
+                (click)="batchExperiments.refetch()"
               ></button>
             </span>
           </td>
@@ -140,14 +154,18 @@
 </div>
 <p-dialog
   maskStyleClass="backdrop-blur-sm"
-  header="Reactor Details"
-  [header]="isEditMode() ? 'Edit reactor' : 'Add New reactor'"
+  header="Experiment Details"
+  [header]="selectedExperiment() ? 'Edit experiment' : 'Add New experiment'"
   [(visible)]="displayModal"
   [modal]="true"
   [style]="{ width: '1400px' }"
   maximizable="true"
 >
-  <app-batch-experiment-modal />
+  <app-batch-experiment-modal
+    [batchExperimentData]="selectedExperiment()"
+    (mutationStatus)="onMutateExperiment($event)"
+    (closeModal)="displayModal.set(false)"
+  />
 </p-dialog>
 <p-toast />
 <p-confirmdialog />

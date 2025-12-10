@@ -34,12 +34,11 @@
     <p-select
       formControlName="status"
       class="w-full"
-      focusOnHover="true"
-      selectOnFocus="true"
       appendTo="body"
-      checkmark="true"
       [options]="statusOptions()"
       placeholder="Select status"
+      checkmark="true"
+      focusOnHover="true"
     />
     @if (formControls['status'].invalid && (formControls['status'].dirty ||
     formControls['status'].touched)) { @if
@@ -60,7 +59,6 @@
       formControlName="pathway"
       class="w-full"
       focusOnHover="true"
-      selectOnFocus="true"
       appendTo="body"
       checkmark="true"
       [options]="pathwayOptions()"

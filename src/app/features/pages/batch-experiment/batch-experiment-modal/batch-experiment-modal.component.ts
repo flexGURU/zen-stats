@@ -1,4 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  Input,
+  input,
+  model,
+  output,
+  signal,
+} from '@angular/core';
 import {
   Form,
   FormBuilder,
@@ -14,6 +23,11 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
+import { BatchExperimentService } from '../batch-experiment.service';
+import { BatchExperiment } from '../../../../core/models/models';
+import { MessageService } from 'primeng/api';
+import { finalize } from 'rxjs';
+import { reactorQuery } from '../../reactor/reactor.query';
 
 @Component({
   selector: 'app-batch-experiment-modal',
@@ -32,19 +46,37 @@ import { SelectModule } from 'primeng/select';
   styles: ``,
 })
 export class BatchExperimentModalComponent {
-  batchForm!: FormGroup;
+  experimentForm!: FormGroup;
   private fb = inject(FormBuilder);
+
+  modalVisible = model(false);
+  reactors = reactorQuery().reactorData;
+
   co2Forms = signal([
     { label: 'Gaseous', value: 'gaseous' },
     { label: 'Carbonated', value: 'carbonated' },
     { label: 'Liquid', value: 'liquid' },
   ]);
+  mutationStatus = output<Record<string, boolean | string>>();
+  loading = signal(false);
+  @Input() batchExperimentData: BatchExperiment | null = null;
+  closeModal = output<void>();
+
   constructor() {
     this.initializeForm();
   }
+  ngOnChanges() {
+    if (this.batchExperimentData) {
+      this.populateForm();
+    } else {
+      this.experimentForm.reset();
+    }
+  }
+
+  private batchExperimentService = inject(BatchExperimentService);
 
   initializeForm() {
-    this.batchForm = this.fb.group({
+    this.experimentForm = this.fb.group({
       batchId: ['', Validators.required],
       operator: ['', Validators.required],
       date: [null, Validators.required],
@@ -53,24 +85,24 @@ export class BatchExperimentModalComponent {
       timeStart: ['', Validators.required],
       timeEnd: ['', Validators.required],
 
-      mixDesign: ['', Validators.required],
-      cement: [null, [Validators.required, Validators.min(0)]],
-      fineAggregate: [null, [Validators.required, Validators.min(0)]],
-      coarseAggregate: [null, [Validators.required, Validators.min(0)]],
-      water: [null, [Validators.required, Validators.min(0)]],
-      waterCementRatio: [null, [Validators.required, Validators.min(0)]],
-      blockSizeLength: [null, [Validators.required, Validators.min(0)]],
-      blockSizeWidth: [null, [Validators.required, Validators.min(0)]],
-      blockSizeHeight: [null, [Validators.required, Validators.min(0)]],
+      mixDesign: [''],
+      cement: [null, Validators.min(0)],
+      fineAggregate: [null, Validators.min(0)],
+      coarseAggregate: [null, Validators.min(0)],
+      water: [null, Validators.min(0)],
+      waterCementRatio: [null, Validators.min(0)],
+      blockSizeLength: [null, Validators.min(0)],
+      blockSizeWidth: [null, Validators.min(0)],
+      blockSizeHeight: [null, Validators.min(0)],
 
       gasCO2: [false],
       deliveryPressure: [false],
 
-      co2Form: ['', Validators.required],
-      co2Mass: [null, [Validators.required, Validators.min(0)]],
-      injectionPressure: [null, [Validators.required, Validators.min(0)]],
-      headSpace: [null, [Validators.required, Validators.min(0)]],
-      reactionTime: [null, [Validators.required, Validators.min(0)]],
+      co2Form: [''],
+      co2Mass: [null, Validators.min(0)],
+      injectionPressure: [null, Validators.min(0)],
+      headSpace: [null, Validators.min(0)],
+      reactionTime: [null, Validators.min(0)],
 
       tgaSampleId: [''],
       xrdSampleId: [''],
@@ -80,19 +112,159 @@ export class BatchExperimentModalComponent {
     });
   }
 
+  populateForm() {
+    console.log('data', this.batchExperimentData);
+
+    this.experimentForm.patchValue({
+      batchId: this.batchExperimentData?.batchId,
+      operator: this.batchExperimentData?.operator,
+      date: this.shortenDate(this.batchExperimentData?.date || ''),
+      reactorId: this.batchExperimentData?.reactorId,
+      blockId: this.batchExperimentData?.blockId,
+      timeStart: this.timeStringToDate(this.batchExperimentData?.timeStart),
+      timeEnd: this.timeStringToDate(this.batchExperimentData?.timeEnd),
+
+      mixDesign: this.batchExperimentData?.materialFeedstock?.mixDesign,
+      cement: this.batchExperimentData?.materialFeedstock?.cement,
+      fineAggregate: this.batchExperimentData?.materialFeedstock?.fineAggregate,
+      coarseAggregate:
+        this.batchExperimentData?.materialFeedstock?.coarseAggregate,
+      water: this.batchExperimentData?.materialFeedstock?.water,
+      waterCementRatio:
+        this.batchExperimentData?.materialFeedstock?.waterCementRatio,
+      blockSizeLength:
+        this.batchExperimentData?.materialFeedstock?.blockSizeLength,
+      blockSizeWidth:
+        this.batchExperimentData?.materialFeedstock?.blockSizeWidth,
+      blockSizeHeight:
+        this.batchExperimentData?.materialFeedstock?.blockSizeHeight,
+
+      co2Form: this.batchExperimentData?.exposureConditions?.co2Form,
+      co2Mass: this.batchExperimentData?.exposureConditions?.co2Mass,
+      injectionPressure:
+        this.batchExperimentData?.exposureConditions?.injectionPressure,
+      headSpace: this.batchExperimentData?.exposureConditions?.headSpace,
+      reactionTime: this.batchExperimentData?.exposureConditions?.reactionTime,
+    });
+  }
+
+  get formControls() {
+    return this.experimentForm.controls;
+  }
+
   onSubmit() {
-    if (this.batchForm.invalid) {
-      console.log('Form Data:', this.batchForm.value);
-      // Handle form submission
-    } else {
-      console.log('Form is invalid');
+    if (this.experimentForm.invalid) return;
+    const payload: BatchExperiment = this.experimentForm.getRawValue();
+
+    if (payload) {
+      payload.timeStart = this.formatTime(payload.timeStart) ?? '';
+      payload.timeEnd = this.formatTime(payload.timeEnd) ?? '';
+      payload.date = this.formatDate(new Date(payload.date));
     }
+    console.log('payload', payload);
+
+    this.loading.set(true);
+
+    this.batchExperimentData
+      ? this.updateBatchExperiment(this.batchExperimentData.id, payload)
+      : this.createBatchExperiment(payload);
+  }
+
+  createBatchExperiment(experiment: BatchExperiment) {
+    this.batchExperimentService
+      .createBatchExperiment(experiment)
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.mutationStatus.emit({
+            status: true,
+            detail: 'Experiment created successfully',
+          });
+          this.closeModal.emit();
+        },
+        error: () => {
+          this.mutationStatus.emit({
+            status: false,
+            detail: 'Error creating experiment',
+          });
+        },
+      });
+  }
+
+  updateBatchExperiment(experimentId: number, experiment: BatchExperiment) {
+    this.batchExperimentService
+      .updateBatchExperiment(experimentId, experiment)
+      .pipe(
+        finalize(() => {
+          this.loading.set(false);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.mutationStatus.emit({
+            status: true,
+            detail: 'Experiment updated successfully',
+          });
+          this.closeModal.emit();
+        },
+        error: () => {
+          this.mutationStatus.emit({
+            status: false,
+            detail: 'Error updating experiment',
+          });
+        },
+      });
   }
   onFileSelect(event: any, fieldName: string) {
     const file = event.files[0];
-    this.batchForm.patchValue({ [fieldName]: file });
+    this.experimentForm.patchValue({ [fieldName]: file });
   }
   reset() {
-    this.batchForm.reset();
+    this.experimentForm.reset();
+  }
+  private formatTime(date: any): string | null {
+    if (!date) return null;
+
+    const d = new Date(date);
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+  }
+
+  private shortenDate(date: string | Date): string {
+    const d = new Date(date);
+
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
+  private formatDate(date: Date): Date {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    const formatted = `${year}-${month}-${day}`;
+
+    let formattedDate = new Date(formatted);
+
+    return formattedDate;
+  }
+  private timeStringToDate(time: string | undefined): Date | null {
+    if (!time) return null;
+
+    const [hours, minutes] = time.split(':').map(Number);
+
+    const d = new Date(); // today's date
+    d.setHours(hours, minutes, 0, 0); // set hours and minutes
+
+    return d;
   }
 }

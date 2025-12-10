@@ -48,3 +48,46 @@ export interface LoginResponse {
   refresh_token: string;
   user: User;
 }
+
+export interface MaterialFeedstock {
+  mixDesign: string;
+  cement: string;
+  fineAggregate: string;
+  coarseAggregate: string;
+  water: string;
+  waterCementRatio: string;
+  blockSizeLength: string;
+  blockSizeWidth: string;
+  blockSizeHeight: string;
+}
+
+export interface ExposureConditions {
+  co2Form: 'liquid' | 'gas' | 'carbonated';
+  co2Mass: string;
+  injectionPressure: string;
+  headSpace: string;
+  reactionTime: string;
+}
+
+export interface AnalyticalTest {
+  name: string;
+  sampleId: string;
+  date: Date;
+  pdfUrl: string;
+}
+
+export interface BatchExperiment {
+  id: number;
+  batchId: string;
+  reactorId: number;
+  operator: string;
+  date: Date;
+  blockId: string;
+  timeStart: string;
+  timeEnd: string;
+  materialFeedstock: MaterialFeedstock;
+  exposureConditions: ExposureConditions;
+  analyticalTests: AnalyticalTest[];
+  deletedAt: string | null;
+  createdAt: string;
+}

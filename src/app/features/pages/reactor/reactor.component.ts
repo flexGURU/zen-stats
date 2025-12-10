@@ -15,6 +15,7 @@ import { Message } from 'primeng/message';
 import { Chip } from 'primeng/chip';
 import { CommonModule } from '@angular/common';
 import { ReactorService } from './reactor.service';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-reactor',
@@ -27,9 +28,9 @@ import { ReactorService } from './reactor.service';
     FormsModule,
     InputTextModule,
     ConfirmDialog,
-    ProgressSpinner,
     Message,
     CommonModule,
+    TagModule,
   ],
   templateUrl: './reactor.component.html',
   providers: [ConfirmationService, MessageService],
@@ -42,6 +43,8 @@ export class ReactorComponent {
   loading = signal(true);
   selectedReactor = signal<Reactor | null>(null);
   reactorName = signal('');
+  status = signal('');
+  pathway = signal('');
 
   reactors = reactorQuery().reactorData;
 
@@ -49,8 +52,12 @@ export class ReactorComponent {
 
   constructor() {
     effect(() => {
+      console.log("ssssaSS",this.displayModal());
+      
       if (!this.displayModal()) {
         this.selectedReactor.set(null);
+        console.log("selected", this.selectedReactor());
+        
       }
     });
 
@@ -115,4 +122,6 @@ export class ReactorComponent {
       detail: detail ? (detail as string) : 'Error creating reactor',
     });
   }
+
+  clearFilters() {}
 }
