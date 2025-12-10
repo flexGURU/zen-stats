@@ -33,12 +33,13 @@
     <p-select
       formControlName="status"
       class="w-full"
-      focusOnHover="true"
       appendTo="body"
-      checkmark="true"
-      showClear="true"
+      optionLabel="label"
+      optionValue="value"
       [options]="statusOptions()"
       placeholder="Select status"
+      focusOnHover="true"
+      checkmark="true"
     />
 
     @if (formControls['status'].invalid && (formControls['status'].dirty ||

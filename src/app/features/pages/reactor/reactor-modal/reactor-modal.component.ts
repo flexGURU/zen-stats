@@ -3,6 +3,7 @@ import {
   Component,
   effect,
   inject,
+  Input,
   input,
   model,
   output,
@@ -44,7 +45,8 @@ export class ReactorModalComponent {
 
   visible = model(false);
   isEditMode = model(false);
-  reactorData = input<Reactor | null>(null);
+  @Input() reactorData: Reactor | null = null;
+
   loading = signal(false);
 
   private fb = inject(FormBuilder);
@@ -63,16 +65,6 @@ export class ReactorModalComponent {
 
   constructor() {
     this.initialiseForm();
-    this.populateForm();
-    effect(() => {
-      if (!this.visible()) {
-        this.reactorForm.reset();
-      }
-    });
-
-    effect(() => {
-      this.populateForm();
-    });
   }
 
   initialiseForm() {
@@ -84,12 +76,20 @@ export class ReactorModalComponent {
     });
   }
 
+  ngOnChanges() {
+    if (this.reactorData) {
+      this.populateForm();
+    } else {
+      this.reactorForm.reset();
+    }
+  }
+
   populateForm() {
     this.reactorForm.patchValue({
-      name: this.reactorData()?.name,
-      pathway: this.reactorData()?.pathway,
-      pdfUrl: this.reactorData()?.pdfUrl,
-      status: this.reactorData()?.status,
+      name: this.reactorData?.name,
+      pathway: this.reactorData?.pathway,
+      pdfUrl: this.reactorData?.pdfUrl,
+      status: this.reactorData?.status,
     });
   }
   get formControls() {
@@ -99,8 +99,9 @@ export class ReactorModalComponent {
   onSubmit() {
     if (this.reactorForm.invalid) return;
     const reactor: Reactor = this.reactorForm.getRawValue();
+    this.loading.set(true);
 
-    this.reactorData()
+    this.reactorData
       ? this.updateReactor(reactor)
       : this.createReactor(reactor);
   }
@@ -117,20 +118,20 @@ export class ReactorModalComponent {
         next: () => {
           this.mutationStatus.emit({
             status: true,
-            detail: 'Reactor updated successfully',
+            detail: 'Reactor created successfully',
           });
         },
         error: () => {
           this.mutationStatus.emit({
             status: false,
-            detail: 'Error updating reactor',
+            detail: 'Error creating reactor',
           });
         },
       });
   }
   updateReactor(reactor: Reactor) {
     this.reactorService
-      .updateReactor(this.reactorData()!.id, reactor)
+      .updateReactor(this.reactorData!.id, reactor)
       .pipe(
         finalize(() => {
           this.loading.set(false);
@@ -155,5 +156,9 @@ export class ReactorModalComponent {
   onFileSelect(event: any, fieldName: string) {
     const file = event.files[0];
     this.reactorForm.patchValue({ [fieldName]: file });
+  }
+
+  ngOnDestroy() {
+    this.reactorForm.reset();
   }
 }
