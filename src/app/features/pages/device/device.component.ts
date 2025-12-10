@@ -65,10 +65,6 @@ export class DeviceComponent {
         this.selectedDevice.set(null);
       }
     });
-
-    effect(() => {
-      console.log('sss', this.deviceName(), this.status());
-    });
   }
 
   editDevice(device: Device) {
@@ -127,9 +123,7 @@ export class DeviceComponent {
     });
   }
 
-  applyFilters() {
-    
-  }
+  applyFilters() {}
 
   clearFilters() {
     this.deviceName.set('');

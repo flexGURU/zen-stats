@@ -129,7 +129,4 @@ export class DeviceModalComponent {
         },
       });
   }
-  compareFn(option: any, value: any): boolean {
-    return option === value;
-  }
 }

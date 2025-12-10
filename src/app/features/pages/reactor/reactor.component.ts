@@ -52,12 +52,8 @@ export class ReactorComponent {
 
   constructor() {
     effect(() => {
-      console.log("ssssaSS",this.displayModal());
-      
       if (!this.displayModal()) {
         this.selectedReactor.set(null);
-        console.log("selected", this.selectedReactor());
-        
       }
     });
 
