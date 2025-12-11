@@ -41,7 +41,8 @@ import { InputTextModule } from 'primeng/inputtext';
     TagModule,
     FormsModule,
     InputTextModule,
-  ],
+    RouterLink
+],
   templateUrl: './device.component.html',
   providers: [MessageService, ConfirmationService],
 })

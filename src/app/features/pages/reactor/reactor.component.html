@@ -111,9 +111,9 @@
       >
         <ng-template #header>
           <tr>
-            <th>Name</th>
-            <th>Pathway</th>
-            <th>Status</th>
+            <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="pathway">Pathway <p-sortIcon field="pathway"></p-sortIcon></th>
+            <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
             <th>Actions</th>
           </tr>
         </ng-template>

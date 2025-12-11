@@ -3,6 +3,7 @@
     <div>
       @for (item of sidebarLinks(); track $index) {
       <a
+        pRipple
         [routerLink]="item.route"
         (click)="visible.set(false)"
         routerLinkActive="active"

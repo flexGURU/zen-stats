@@ -139,6 +139,8 @@ export class ReactorModalComponent {
       )
       .subscribe({
         next: () => {
+          this.reactorForm.reset();
+          this.selectedFile.set(null);
           this.mutationStatus.emit({
             status: true,
             detail: 'Reactor created successfully',
@@ -162,6 +164,8 @@ export class ReactorModalComponent {
       )
       .subscribe({
         next: () => {
+          this.reactorForm.reset();
+          this.selectedFile.set(null);
           this.mutationStatus.emit({
             status: true,
             detail: 'Reactor updated successfully',

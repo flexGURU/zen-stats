@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { AuthService } from '../../features/pages/login/auth.service';
 import { finalize } from 'rxjs';
+import { Ripple } from 'primeng/ripple';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,7 +14,7 @@ import { finalize } from 'rxjs';
     ButtonModule,
     RouterLink,
     CommonModule,
-    RouterLinkActive,
+    RouterLinkActive,Ripple
   ],
   templateUrl: './sidebar.component.html',
   styles: ``,
