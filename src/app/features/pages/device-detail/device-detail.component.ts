@@ -54,7 +54,7 @@ export class DeviceDetailComponent {
   endTime = signal<Date | null>(null);
 
   items = [{ label: '' }];
-  home = { icon: 'pi pi-home', url: '/' };
+  home = { icon: 'pi pi-cog', url: '/devices', label: 'Devices' };
 
   deviceService = inject(DeviceDetailService);
 

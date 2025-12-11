@@ -4,7 +4,7 @@
       <p-breadcrumb [model]="breadCrumbItem()" [home]="home">
         <ng-template #separator> / </ng-template>
       </p-breadcrumb>
-      <p-message severity="success">
+      <p-message severity="info">
         <h3 class="text-xl">As On</h3>
 
         @let timestamp = deviceData.data()?.[0]?.payload?.server_timestamp;
