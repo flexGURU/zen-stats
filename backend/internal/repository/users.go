@@ -34,9 +34,9 @@ type FilterUsers struct {
 }
 
 type DashboardStats struct {
-	TotalUsers                       uint32  `json:"totalUsers,omitempty"`
-	ActiveUsers                      uint32  `json:"activeUsers,omitempty"`
-	InactiveUsers                    uint32  `json:"inactiveUsers,omitempty"`
+	TotalUsers                       uint32  `json:"totalUsers"`
+	ActiveUsers                      uint32  `json:"activeUsers"`
+	InactiveUsers                    uint32  `json:"inactiveUsers"`
 	TotalDevices                     uint32  `json:"totalDevices"`
 	ActiveDevices                    uint32  `json:"activeDevices"`
 	InactiveDevices                  uint32  `json:"inactiveDevices"`
