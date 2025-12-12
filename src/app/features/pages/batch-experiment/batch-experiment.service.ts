@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable } from 'rxjs';
@@ -11,9 +11,28 @@ export class BatchExperimentService {
   private readonly apiUrl = environment.APIURL;
   private http = inject(HttpClient);
 
+  search = signal('');
+  date = signal<Date | null>(null);
+
+  constructor() {
+    effect(() => {
+      console.log('base api url', this.baseApiUrl());
+    });
+  }
+
+  baseApiUrl = computed(() => {
+    const params = new URLSearchParams();
+
+    if (this.search()) params.set('search', this.search());
+    if (this.date())
+      params.set('date', this.date()!.toISOString().split('T')[0]);
+
+    return `${this.apiUrl}/experiments?${params.toString()}`;
+  });
+
   getBatchExperiments(): Observable<BatchExperiment[]> {
     return this.http
-      .get<{ data: BatchExperiment[] }>(`${this.apiUrl}/experiments`)
+      .get<{ data: BatchExperiment[] }>(`${this.baseApiUrl()}`)
       .pipe(
         map((response) => response.data),
         catchError((error) => {

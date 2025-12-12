@@ -9,7 +9,7 @@ import { BatchExperimentModalComponent } from './batch-experiment-modal/batch-ex
 import { InputTextModule } from 'primeng/inputtext';
 import { DatePicker, DatePickerModule } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { batchExperimentQuery } from './batch-experiment.query';
 import { BatchExperiment } from '../../../core/models/models';
 import { BatchExperimentService } from './batch-experiment.service';
@@ -41,9 +41,8 @@ export class BatchExperimentComponent {
   todaysDate = this.datePlacehHolder.toLocaleDateString();
   selectedExperiment = signal<BatchExperiment | null>(null);
 
-  batchId = signal('');
-  reactorName = signal('');
-  date = signal('');
+  searchTerm = signal('');
+  date = signal<Date | null>(null);
 
   batchExperiments = batchExperimentQuery().batchExperimentData;
   private batchExperimentService = inject(BatchExperimentService);
@@ -53,6 +52,9 @@ export class BatchExperimentComponent {
       if (!this.displayModal()) {
         this.selectedExperiment.set(null);
       }
+    });
+    effect(() => {
+      this.applyFilters();
     });
   }
 
@@ -67,11 +69,29 @@ export class BatchExperimentComponent {
     this.displayModal.set(true);
   };
 
-  filter() {}
+  applyFilters() {
+    this.batchExperimentService.search.set(this.searchTerm());
+    this.batchExperimentService.date.set(
+      this.formatDate(new Date(this.date()!))
+    );
+  }
+  private formatDate(date: Date): Date {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+
+    const formatted = `${year}-${month}-${day}`;
+
+    let formattedDate = new Date(formatted);
+
+    return formattedDate;
+  }
   clearFilters() {
-    this.batchId.set('');
-    this.reactorName.set('');
-    this.date.set('');
+    this.batchExperimentService.search.set('');
+    this.batchExperimentService.date.set(null);
+    this.searchTerm.set('');
+    this.date.set(null);
+    this.batchExperiments.refetch();
   }
 
   deleteBatchExperiment = (experimentId: number) => {

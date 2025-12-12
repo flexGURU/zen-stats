@@ -16,6 +16,8 @@ import { Chip } from 'primeng/chip';
 import { CommonModule } from '@angular/common';
 import { ReactorService } from './reactor.service';
 import { TagModule } from 'primeng/tag';
+import { SelectModule } from 'primeng/select';
+import { pathwayOptions, statusOptions } from '../../../core/utils/options';
 
 @Component({
   selector: 'app-reactor',
@@ -31,6 +33,7 @@ import { TagModule } from 'primeng/tag';
     Message,
     CommonModule,
     TagModule,
+    SelectModule,
   ],
   templateUrl: './reactor.component.html',
   providers: [ConfirmationService, MessageService],
@@ -45,6 +48,8 @@ export class ReactorComponent {
   reactorName = signal('');
   status = signal('');
   pathway = signal('');
+  statusOptions = signal(statusOptions);
+  pathwayOptions = signal(pathwayOptions);
 
   reactors = reactorQuery().reactorData;
 
@@ -57,7 +62,24 @@ export class ReactorComponent {
       }
     });
 
-    effect(() => {});
+    effect(() => {
+      console.log(
+        'selected',
+        this.reactorName(),
+        this.status(),
+        this.pathway()
+      );
+    });
+
+    effect(() => {
+      this.applyFilters()
+    })
+  }
+
+  applyFilters() {
+    this.reactorService.search.set(this.reactorName());
+    this.reactorService.status.set(this.status());
+    this.reactorService.pathway.set(this.pathway());
   }
 
   editReactor = (reactor: Reactor) => {
@@ -119,5 +141,13 @@ export class ReactorComponent {
     });
   }
 
-  clearFilters() {}
+  clearFilters() {
+    this.reactorService.search.set('');
+    this.reactorService.status.set('');
+    this.reactorService.pathway.set('');
+    this.reactorName.set('');
+    this.status.set('');
+    this.pathway.set('');
+    this.reactors.refetch();
+  }
 }

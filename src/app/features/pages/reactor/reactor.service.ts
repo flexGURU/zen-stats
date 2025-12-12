@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable } from 'rxjs';
@@ -11,8 +11,28 @@ export class ReactorService {
   private readonly apiUrl = environment.APIURL;
   private http = inject(HttpClient);
 
+  search = signal('');
+  status = signal('');
+  pathway = signal('');
+
+  constructor() {
+    effect(() => {
+      console.log('base', this.baseApiUrl());
+    });
+  }
+
+  baseApiUrl = computed(() => {
+    const params = new URLSearchParams();
+
+    if (this.search()) params.set('search', this.search());
+    if (this.status()) params.set('status', this.status());
+    if (this.pathway()) params.set('pathway', this.pathway());
+
+    return `${this.apiUrl}/reactors?${params.toString()}`;
+  });
+
   getReactors = (): Observable<Reactor[]> => {
-    return this.http.get<{ data: Reactor[] }>(`${this.apiUrl}/reactors`).pipe(
+    return this.http.get<{ data: Reactor[] }>(`${this.baseApiUrl()}`).pipe(
       map((response) => response.data),
       catchError((error) => {
         console.error(error);

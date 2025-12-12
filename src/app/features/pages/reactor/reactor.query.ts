@@ -7,7 +7,7 @@ export const reactorQuery = () => {
   const reactorService = inject(ReactorService);
 
   const reactorData = injectQuery(() => ({
-    queryKey: ['reactorData'],
+    queryKey: ['reactorData', reactorService.baseApiUrl()],
     queryFn: () => lastValueFrom(reactorService.getReactors()),
     staleTime: 1000 * 60 * 1,
   }));

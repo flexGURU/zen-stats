@@ -7,7 +7,7 @@ export const batchExperimentQuery = () => {
   const batchExperimentService = inject(BatchExperimentService);
 
   const batchExperimentData = injectQuery(() => ({
-    queryKey: ['batchExperimentData'],
+    queryKey: ['batchExperimentData', batchExperimentService.baseApiUrl()],
     queryFn: () => lastValueFrom(batchExperimentService.getBatchExperiments()),
     staleTime: 1000 * 60 * 1,
   }));

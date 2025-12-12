@@ -16,56 +16,31 @@
         ></button>
       </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
-      <div>
-        <label
-          for="batchId"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Batch ID
-        </label>
-        <input
-          pInputText
-          id="batchId"
-          [(ngModel)]="batchId"
-          class="w-full"
-          placeholder="R01/001"
-          type="text"
-          pSize="small"
-        />
-      </div>
-      <div>
-        <label
-          for="batchId"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Reactor Name
-        </label>
-        <input
-          pInputText
-          id="reactorName"
-          [(ngModel)]="reactorName"
-          class="w-full"
-          placeholder="R01"
-          type="text"
-          pSize="small"
-        />
-      </div>
-      <div>
-        <label
-          for="batchId"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Date
-        </label>
-        <p-datepicker
-          id="date"
-          class="w-full"
-          [placeholder]="todaysDate.toString()"
-          [(ngModel)]="date"
-          type="text"
-          size="small"
-        />
+    <div
+      class="flex flex-col md:flex-row justify-between items-center px-2 mb-1 gap-4"
+    >
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-2 p-2">
+        <div class="md:col-span-2">
+          <input
+            pInputText
+            id="batchId"
+            [(ngModel)]="searchTerm"
+            class="w-full"
+            placeholder="Search by Batch ID, Operator or Block ID"
+            type="text"
+            pSize="small"
+          />
+        </div>
+        <div>
+          <p-datepicker
+            id="date"
+            class="w-full"
+            placeholder="Date"
+            [(ngModel)]="date"
+            type="text"
+            size="small"
+          />
+        </div>
       </div>
       <div class="h-full flex gap-2 justify-end items-end">
         <button
@@ -80,7 +55,7 @@
           (click)="clearFilters()"
           pButton
           type="button"
-          label="Clear Filters"
+          label="Clear "
           icon="pi pi-times"
           size="small"
         ></button>
@@ -102,7 +77,6 @@
           <th>Operator</th>
           <th>Reactor ID</th>
           <th>Block ID</th>
-          <th>Date</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -112,7 +86,6 @@
           <td>{{ experiment.operator }}</td>
           <td>{{ experiment.reactorId }}</td>
           <td>{{ experiment.blockId }}</td>
-          <td>{{ experiment.date | date : "mediumDate" }}</td>
           <td>
             <button
               (click)="editBatchExperiment(experiment)"
