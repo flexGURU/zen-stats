@@ -15,7 +15,7 @@ import (
 const countExperimentsRunThisWeek = `-- name: CountExperimentsRunThisWeek :one
 SELECT COUNT(*) AS experiments_done_this_week
 FROM experiments
-WHERE date >= date_trunc('week', CURRENT_DATE) AND deleted_at IS NULL
+WHERE date::date >= date_trunc('week', CURRENT_DATE) AND deleted_at IS NULL
 `
 
 func (q *Queries) CountExperimentsRunThisWeek(ctx context.Context) (int64, error) {
@@ -193,7 +193,7 @@ WHERE deleted_at IS NULL
     )
     AND (
         $3::timestamptz IS NULL 
-        OR date = $3
+        OR date::date = $3
     )
 ORDER BY created_at DESC
 LIMIT $5 OFFSET $4

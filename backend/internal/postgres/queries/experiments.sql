@@ -44,7 +44,7 @@ WHERE deleted_at IS NULL
     )
     AND (
         sqlc.narg('date')::timestamptz IS NULL 
-        OR date = sqlc.narg('date')
+        OR date::date = sqlc.narg('date')
     )
 ORDER BY created_at DESC
 LIMIT sqlc.arg('limit') OFFSET sqlc.arg('offset');
@@ -81,7 +81,7 @@ WHERE date::date = CURRENT_DATE AND deleted_at IS NULL;
 -- name: CountExperimentsRunThisWeek :one
 SELECT COUNT(*) AS experiments_done_this_week
 FROM experiments
-WHERE date >= date_trunc('week', CURRENT_DATE) AND deleted_at IS NULL;
+WHERE date::date >= date_trunc('week', CURRENT_DATE) AND deleted_at IS NULL;
 
 -- name: GetAverageExperimentDuration :one
 SELECT AVG(EXTRACT(EPOCH FROM (time_end - time_start))) AS average_experiment_duration
