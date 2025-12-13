@@ -68,13 +68,17 @@ export class BatchExperimentComponent {
     this.isEditMode.set(false);
     this.displayModal.set(true);
   };
-
   applyFilters() {
     this.batchExperimentService.search.set(this.searchTerm());
-    this.batchExperimentService.date.set(
-      this.formatDate(new Date(this.date()!))
-    );
+
+    const date = this.date();
+    if (date) {
+      this.batchExperimentService.date.set(this.formatDate(date));
+    } else {
+      this.batchExperimentService.date.set(null);
+    }
   }
+
   private formatDate(date: Date): Date {
     const day = String(date.getDate()).padStart(2, '0');
     const month = String(date.getMonth() + 1).padStart(2, '0');

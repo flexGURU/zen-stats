@@ -15,9 +15,7 @@ export class BatchExperimentService {
   date = signal<Date | null>(null);
 
   constructor() {
-    effect(() => {
-      console.log('base api url', this.baseApiUrl());
-    });
+    effect(() => {});
   }
 
   baseApiUrl = computed(() => {
