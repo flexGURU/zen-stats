@@ -75,8 +75,7 @@ export class BatchExperimentModalComponent {
     effect(() => {
       const batch = this.batchExperimentData();
       if (batch) {
-       console.log("batch data",batch);
-       
+        console.log('batch data', batch);
       }
     });
   }
@@ -123,7 +122,7 @@ export class BatchExperimentModalComponent {
       this.reset();
     }
 
-   this.modalVisible.set(true);
+    this.modalVisible.set(true);
   }
   get formControls() {
     return this.experimentForm.controls;
@@ -147,8 +146,8 @@ export class BatchExperimentModalComponent {
   }
 
   removeAnalyticalTest(index: number) {
-    console.log("index", index);
-    
+    console.log('index', index);
+
     this.analyticalTests.removeAt(index);
     // Clean up upload state for this index
     this.uploadingFiles.update((map) => {
@@ -160,8 +159,6 @@ export class BatchExperimentModalComponent {
 
   removeFile(url: string, index: number) {
     this.analyticalTests.at(index).patchValue({ pdfUrl: null });
-
-    this.firebaseService.removeImage(url).subscribe();
   }
 
   populateForm() {
