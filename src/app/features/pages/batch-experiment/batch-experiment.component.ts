@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialog } from 'primeng/confirmdialog';
@@ -33,6 +33,9 @@ import { BatchExperimentService } from './batch-experiment.service';
   providers: [ConfirmationService, MessageService],
 })
 export class BatchExperimentComponent {
+  @ViewChild('batchExperimentModal')
+  batchExperimentModal!: BatchExperimentModalComponent;
+
   displayModal = signal(false);
   isEditMode = signal(false);
   confirmationService = inject(ConfirmationService);
@@ -58,10 +61,17 @@ export class BatchExperimentComponent {
     });
   }
 
-  editBatchExperiment = (experiment: BatchExperiment) => {
-    this.isEditMode.set(true);
-    this.selectedExperiment.set(experiment);
-    this.displayModal.set(true);
+  editBatchExperiment = (experiment: BatchExperiment | null) => {
+    if (experiment) {
+      this.batchExperimentModal.openModal(experiment);
+      this.isEditMode.set(true);
+      this.selectedExperiment.set(experiment);
+      this.displayModal.set(true);
+    } else {
+
+      this.batchExperimentModal.openModal(null);
+      this.displayModal.set(true);
+    }
   };
 
   createBatchExperiment = () => {

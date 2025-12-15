@@ -7,7 +7,7 @@
 
       <div>
         <button
-          (click)="displayModal.set(true)"
+          (click)="editBatchExperiment(null)"
           pButton
           type="button"
           label="Add Batch"
@@ -69,6 +69,7 @@
       dataKey="id"
       [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
       size="small"
+      multiple="false"
       [loading]="batchExperiments.isLoading()"
     >
       <ng-template #header>
@@ -77,6 +78,7 @@
           <th>Operator</th>
           <th>Reactor ID</th>
           <th>Block ID</th>
+          <th>Created At</th>
           <th>Actions</th>
         </tr>
       </ng-template>
@@ -86,6 +88,8 @@
           <td>{{ experiment.operator }}</td>
           <td>{{ experiment.reactorId }}</td>
           <td>{{ experiment.blockId }}</td>
+          <td>{{ experiment.createdAt | date : "medium" }}</td>
+
           <td>
             <button
               (click)="editBatchExperiment(experiment)"
@@ -136,7 +140,7 @@
   maximizable="true"
 >
   <app-batch-experiment-modal
-    [batchExperimentData]="selectedExperiment()"
+    #batchExperimentModal
     (mutationStatus)="onMutateExperiment($event)"
     (closeModal)="displayModal.set(false)"
   />

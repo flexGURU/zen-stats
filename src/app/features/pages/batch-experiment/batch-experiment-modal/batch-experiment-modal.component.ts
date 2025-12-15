@@ -30,6 +30,7 @@ import { MessageService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import { reactorQuery } from '../../reactor/reactor.query';
 import { FirebaseService } from '../../../../core/services/firebase.service';
+import { ProgressSpinner } from 'primeng/progressspinner';
 
 @Component({
   selector: 'app-batch-experiment-modal',
@@ -43,6 +44,7 @@ import { FirebaseService } from '../../../../core/services/firebase.service';
     ButtonModule,
     FileUploadModule,
     SelectModule,
+    ProgressSpinner,
   ],
   templateUrl: './batch-experiment-modal.component.html',
   styles: ``,
@@ -61,25 +63,21 @@ export class BatchExperimentModalComponent {
   ]);
   mutationStatus = output<Record<string, boolean | string>>();
   loading = signal(false);
-  @Input() batchExperimentData: BatchExperiment | null = null;
+  batchExperimentData = signal<BatchExperiment | null>(null);
   closeModal = output<void>();
   selectedFile = signal<File | null>(null);
-  uploadingFile = signal({
-    status: false,
-    fileIndex: 0,
-  });
+  uploadingFiles = signal<Map<number, boolean>>(new Map());
 
   private firebaseService = inject(FirebaseService);
 
   constructor() {
     this.initializeForm();
-  }
-  ngOnChanges() {
-    if (this.batchExperimentData) {
-      this.populateForm();
-    } else {
-      this.experimentForm.reset();
-    }
+    effect(() => {
+      const batch = this.batchExperimentData();
+      if (batch) {
+        console.log('batch data', batch);
+      }
+    });
   }
 
   private batchExperimentService = inject(BatchExperimentService);
@@ -116,6 +114,19 @@ export class BatchExperimentModalComponent {
       analyticalTests: this.fb.array([]),
     });
   }
+  openModal(batchData: BatchExperiment | null) {
+    this.batchExperimentData.set(batchData);
+    if (batchData) {
+      this.populateForm();
+    } else {
+      this.reset();
+    }
+
+    this.modalVisible.set(true);
+  }
+  get formControls() {
+    return this.experimentForm.controls;
+  }
 
   get analyticalTests(): FormArray {
     return this.experimentForm.get('analyticalTests') as FormArray;
@@ -123,69 +134,122 @@ export class BatchExperimentModalComponent {
 
   private createAnalyticalTest(): FormGroup {
     return this.fb.group({
-      testType: ['', Validators.required],
+      name: ['', Validators.required],
       sampleId: ['', Validators.required],
       date: [null],
-      file: [null],
+      pdfUrl: [null],
     });
   }
+
   addAnalyticalTest() {
     this.analyticalTests.push(this.createAnalyticalTest());
   }
 
   removeAnalyticalTest(index: number) {
+    console.log('index', index);
+
     this.analyticalTests.removeAt(index);
-  }
-
-  populateForm() {
-    console.log('data', this.batchExperimentData);
-
-    this.experimentForm.patchValue({
-      batchId: this.batchExperimentData?.batchId,
-      operator: this.batchExperimentData?.operator,
-      date: this.shortenDate(this.batchExperimentData?.date || ''),
-      reactorId: this.batchExperimentData?.reactorId,
-      blockId: this.batchExperimentData?.blockId,
-      timeStart: this.timeStringToDate(this.batchExperimentData?.timeStart),
-      timeEnd: this.timeStringToDate(this.batchExperimentData?.timeEnd),
-
-      mixDesign: this.batchExperimentData?.materialFeedstock?.mixDesign,
-      cement: this.batchExperimentData?.materialFeedstock?.cement,
-      fineAggregate: this.batchExperimentData?.materialFeedstock?.fineAggregate,
-      coarseAggregate:
-        this.batchExperimentData?.materialFeedstock?.coarseAggregate,
-      water: this.batchExperimentData?.materialFeedstock?.water,
-      waterCementRatio:
-        this.batchExperimentData?.materialFeedstock?.waterCementRatio,
-      blockSizeLength:
-        this.batchExperimentData?.materialFeedstock?.blockSizeLength,
-      blockSizeWidth:
-        this.batchExperimentData?.materialFeedstock?.blockSizeWidth,
-      blockSizeHeight:
-        this.batchExperimentData?.materialFeedstock?.blockSizeHeight,
-
-      co2Form: this.batchExperimentData?.exposureConditions?.co2Form,
-      co2Mass: this.batchExperimentData?.exposureConditions?.co2Mass,
-      injectionPressure:
-        this.batchExperimentData?.exposureConditions?.injectionPressure,
-      headSpace: this.batchExperimentData?.exposureConditions?.headSpace,
-      reactionTime: this.batchExperimentData?.exposureConditions?.reactionTime,
+    // Clean up upload state for this index
+    this.uploadingFiles.update((map) => {
+      const newMap = new Map(map);
+      newMap.delete(index);
+      return newMap;
     });
   }
 
-  get formControls() {
-    return this.experimentForm.controls;
+  removeFile(url: string, index: number) {
+    this.analyticalTests.at(index).patchValue({ pdfUrl: null });
   }
+
+  populateForm() {
+    console.log('data', this.batchExperimentData());
+
+    this.experimentForm.patchValue({
+      batchId: this.batchExperimentData()?.batchId,
+      operator: this.batchExperimentData()?.operator,
+      date: this.shortenDate(this.batchExperimentData()?.date || ''),
+      reactorId: this.batchExperimentData()?.reactorId,
+      blockId: this.batchExperimentData()?.blockId,
+      timeStart: this.timeStringToDate(this.batchExperimentData()?.timeStart),
+      timeEnd: this.timeStringToDate(this.batchExperimentData()?.timeEnd),
+
+      mixDesign: this.batchExperimentData()?.materialFeedstock?.mixDesign,
+      cement: this.batchExperimentData()?.materialFeedstock?.cement,
+      fineAggregate:
+        this.batchExperimentData()?.materialFeedstock?.fineAggregate,
+      coarseAggregate:
+        this.batchExperimentData()?.materialFeedstock?.coarseAggregate,
+      water: this.batchExperimentData()?.materialFeedstock?.water,
+      waterCementRatio:
+        this.batchExperimentData()?.materialFeedstock?.waterCementRatio,
+      blockSizeLength:
+        this.batchExperimentData()?.materialFeedstock?.blockSizeLength,
+      blockSizeWidth:
+        this.batchExperimentData()?.materialFeedstock?.blockSizeWidth,
+      blockSizeHeight:
+        this.batchExperimentData()?.materialFeedstock?.blockSizeHeight,
+
+      co2Form: this.batchExperimentData()?.exposureConditions?.co2Form,
+      co2Mass: this.batchExperimentData()?.exposureConditions?.co2Mass,
+      injectionPressure:
+        this.batchExperimentData()?.exposureConditions?.injectionPressure,
+      headSpace: this.batchExperimentData()?.exposureConditions?.headSpace,
+      reactionTime:
+        this.batchExperimentData()?.exposureConditions?.reactionTime,
+    });
+    this.populateAnalyticalTests(
+      this.batchExperimentData()?.analyticalTests || []
+    );
+  }
+
+  populateAnalyticalTests(tests: any[]) {
+    const formArray = this.analyticalTests;
+
+    formArray.clear();
+
+    tests.forEach((test) => {
+      formArray.push(
+        this.fb.group({
+          name: [test.name ?? '', Validators.required],
+          sampleId: [test.sampleId ?? '', Validators.required],
+          date: [test.date ? new Date(test.date) : null, Validators.required],
+          pdfUrl: [test.pdfUrl ?? ''],
+        })
+      );
+    });
+  }
+
   onFileSelect(event: any, index: number) {
     const file = event.files?.[0];
     if (file) {
       this.selectedFile.set(file);
+      this.uploadingFiles.update((map) => {
+        const newMap = new Map(map);
+        newMap.set(index, true);
+        return newMap;
+      });
+
+      this.uploadFileEvent()
+        .then((fileUrl) => {
+          if (fileUrl) {
+            this.analyticalTests.at(index).patchValue({ pdfUrl: fileUrl });
+          }
+
+          this.uploadingFiles.update((map) => {
+            const newMap = new Map(map);
+            newMap.set(index, false);
+            return newMap;
+          });
+        })
+        .catch(() => {
+          // Clear uploading state on error
+          this.uploadingFiles.update((map) => {
+            const newMap = new Map(map);
+            newMap.set(index, false);
+            return newMap;
+          });
+        });
     }
-    this.uploadFileEvent().then((fileUrl) => {
-      if (fileUrl) {
-        this.analyticalTests.at(index).patchValue({ file: fileUrl });
-      }
-    });
   }
 
   async uploadFileEvent() {
@@ -194,7 +258,6 @@ export class BatchExperimentModalComponent {
         const fileUrl = await this.firebaseService.uploadImage(
           this.selectedFile()!
         );
-        console.log('file url', fileUrl);
 
         return fileUrl;
       } catch (error) {
@@ -221,8 +284,8 @@ export class BatchExperimentModalComponent {
 
     this.loading.set(true);
 
-    this.batchExperimentData
-      ? this.updateBatchExperiment(this.batchExperimentData.id, payload)
+    this.batchExperimentData()
+      ? this.updateBatchExperiment(this.batchExperimentData()!.id, payload)
       : this.createBatchExperiment(payload);
   }
 
@@ -278,7 +341,10 @@ export class BatchExperimentModalComponent {
 
   reset() {
     this.experimentForm.reset();
+    this.uploadingFiles.set(new Map());
+    this.analyticalTests.clear();
   }
+
   private formatTime(date: any): string | null {
     if (!date) return null;
 
@@ -310,6 +376,7 @@ export class BatchExperimentModalComponent {
 
     return formattedDate;
   }
+
   private timeStringToDate(time: string | undefined): Date | null {
     if (!time) return null;
 
