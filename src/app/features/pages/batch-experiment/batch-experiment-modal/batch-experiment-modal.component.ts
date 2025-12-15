@@ -151,9 +151,9 @@ export class BatchExperimentModalComponent {
   }
 
   removeFile(url: string, index: number) {
-    console.log('url', url);
+    this.analyticalTests.at(index).patchValue({ pdfUrl: null });
 
-    this.analyticalTests.at(index).patchValue({ file: null });
+    this.firebaseService.removeImage(url).subscribe();
   }
 
   populateForm() {
