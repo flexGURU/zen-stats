@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import {
   Form,
+  FormArray,
   FormBuilder,
   FormGroup,
   FormsModule,
@@ -28,6 +29,7 @@ import { BatchExperiment } from '../../../../core/models/models';
 import { MessageService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import { reactorQuery } from '../../reactor/reactor.query';
+import { FirebaseService } from '../../../../core/services/firebase.service';
 
 @Component({
   selector: 'app-batch-experiment-modal',
@@ -61,6 +63,13 @@ export class BatchExperimentModalComponent {
   loading = signal(false);
   @Input() batchExperimentData: BatchExperiment | null = null;
   closeModal = output<void>();
+  selectedFile = signal<File | null>(null);
+  uploadingFile = signal({
+    status: false,
+    fileIndex: 0,
+  });
+
+  private firebaseService = inject(FirebaseService);
 
   constructor() {
     this.initializeForm();
@@ -104,12 +113,28 @@ export class BatchExperimentModalComponent {
       headSpace: [null, Validators.min(0)],
       reactionTime: [null, Validators.min(0)],
 
-      tgaSampleId: [''],
-      xrdSampleId: [''],
-      tgaFile: [null],
-      xrdFile: [null],
-      compositionFile: [null],
+      analyticalTests: this.fb.array([]),
     });
+  }
+
+  get analyticalTests(): FormArray {
+    return this.experimentForm.get('analyticalTests') as FormArray;
+  }
+
+  private createAnalyticalTest(): FormGroup {
+    return this.fb.group({
+      testType: ['', Validators.required],
+      sampleId: ['', Validators.required],
+      date: [null],
+      file: [null],
+    });
+  }
+  addAnalyticalTest() {
+    this.analyticalTests.push(this.createAnalyticalTest());
+  }
+
+  removeAnalyticalTest(index: number) {
+    this.analyticalTests.removeAt(index);
   }
 
   populateForm() {
@@ -150,6 +175,37 @@ export class BatchExperimentModalComponent {
 
   get formControls() {
     return this.experimentForm.controls;
+  }
+  onFileSelect(event: any, index: number) {
+    const file = event.files?.[0];
+    if (file) {
+      this.selectedFile.set(file);
+    }
+    this.uploadFileEvent().then((fileUrl) => {
+      if (fileUrl) {
+        this.analyticalTests.at(index).patchValue({ file: fileUrl });
+      }
+    });
+  }
+
+  async uploadFileEvent() {
+    if (this.selectedFile()) {
+      try {
+        const fileUrl = await this.firebaseService.uploadImage(
+          this.selectedFile()!
+        );
+        console.log('file url', fileUrl);
+
+        return fileUrl;
+      } catch (error) {
+        this.mutationStatus.emit({
+          status: false,
+          detail: 'Error uploading file',
+        });
+        return null;
+      }
+    }
+    return null;
   }
 
   onSubmit() {
@@ -219,10 +275,7 @@ export class BatchExperimentModalComponent {
         },
       });
   }
-  onFileSelect(event: any, fieldName: string) {
-    const file = event.files[0];
-    this.experimentForm.patchValue({ [fieldName]: file });
-  }
+
   reset() {
     this.experimentForm.reset();
   }

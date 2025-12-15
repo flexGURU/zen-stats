@@ -6,9 +6,9 @@ export interface DeviceDetail {
 }
 
 export interface DeviceSummary {
-  id: string | number;
   device_id: string;
-  payload: DeviceDetail;
+  timestamp: string;
+  payload: Record<string, string | number>;
 }
 
 export interface ChartUpdateData {

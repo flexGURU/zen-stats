@@ -8,26 +8,26 @@ import { DeviceDetail, DeviceSummary } from '../../../core/models/models';
   styles: ``,
 })
 export class SensorValueComponent {
-  sensorTable = [
-    { sensor: 'Temperature', value: '' },
-    { sensor: 'Pressure', value: '' },
-    { sensor: 'Co2', value: '' },
-  ];
+  // sensorTable = [
+  //   { sensor: 'Temperature', value: '' },
+  //   { sensor: 'Pressure', value: '' },
+  //   { sensor: 'Co2', value: '' },
+  // ];
 
-  sensorData = input.required<DeviceSummary | undefined>();
+  // sensorData = input.required<DeviceSummary | undefined>();
 
-  sensorDataFinal = computed(() => {
-    const sens = this.sensorData();
+  // sensorDataFinal = computed(() => {
+  //   const sens = this.sensorData();
 
-    this.sensorTable.forEach((element) => {
-      if (element.sensor === 'Temperature') {
-        element.value = sens ? sens.payload.temperature.toString() : 'N/A';
-      } else if (element.sensor === 'Pressure') {
-        element.value = sens ? sens.payload.pressure.toString() : 'N/A';
-      } else if (element.sensor === 'Co2') {
-        element.value = sens ? sens.payload.co2.toString() : 'N/A';
-      }
-    });
-    return this.sensorTable;
-  });
+  //   this.sensorTable.forEach((element) => {
+  //     if (element.sensor === 'Temperature') {
+  //       element.value = sens ? sens.payload.temperature.toString() : 'N/A';
+  //     } else if (element.sensor === 'Pressure') {
+  //       element.value = sens ? sens.payload.pressure.toString() : 'N/A';
+  //     } else if (element.sensor === 'Co2') {
+  //       element.value = sens ? sens.payload.co2.toString() : 'N/A';
+  //     }
+  //   });
+  //   return this.sensorTable;
+  // });
 }
