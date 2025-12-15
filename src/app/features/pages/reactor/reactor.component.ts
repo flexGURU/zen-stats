@@ -62,18 +62,11 @@ export class ReactorComponent {
       }
     });
 
-    effect(() => {
-      console.log(
-        'selected',
-        this.reactorName(),
-        this.status(),
-        this.pathway()
-      );
-    });
+    effect(() => {});
 
     effect(() => {
-      this.applyFilters()
-    })
+      this.applyFilters();
+    });
   }
 
   applyFilters() {

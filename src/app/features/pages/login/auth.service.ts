@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { catchError, map, Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
 import { LoginResponse, User } from '../../../core/models/models';
@@ -19,6 +19,8 @@ export class AuthService {
   private router = inject(Router);
   private readonly apiUrl = environment.APIURL;
   private readonly SESSIONKEY = 'zen_session';
+  private readonly USERKEY = 'zen_user';
+
   private _state = signal<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -31,6 +33,7 @@ export class AuthService {
 
   constructor() {
     this.restoreSession();
+    effect(() => {});
   }
 
   login = (email: string, password: string) => {
@@ -44,6 +47,7 @@ export class AuthService {
             token: response.access_token,
           });
           this.jwtToken = response.access_token;
+          this.jwtUser = response.user;
           this.router.navigate(['/']);
         }),
         catchError((error) => {
@@ -61,13 +65,24 @@ export class AuthService {
     return sessionStorage.getItem(this.SESSIONKEY) || '';
   }
 
+  set jwtUser(user: User) {
+    sessionStorage.setItem(this.USERKEY, JSON.stringify(user));
+  }
+
+  get jwtUser(): User | null {
+    const userData = sessionStorage.getItem(this.USERKEY);
+    return userData ? JSON.parse(userData) : null;
+  }
+
   restoreSession() {
     const token = this.jwtToken;
+    const user: User | null = this.jwtUser;
     if (token) {
       this._state.update((state) => ({
         ...state,
         isAuthenticated: true,
         token: token,
+        user: user,
       }));
     }
   }
