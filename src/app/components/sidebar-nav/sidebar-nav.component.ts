@@ -23,5 +23,10 @@ export class SidebarNavComponent {
       icon: 'pi pi-sliders-h',
       routerLink: '/batch-experiments',
     },
+    {
+      label: 'Users',
+      icon: 'pi pi-users',
+      routerLink: '/users',
+    },
   ]);
 }

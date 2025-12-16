@@ -38,9 +38,9 @@ export interface User {
   name: string;
   email: string;
   phoneNumber: string;
-  roles: 'admin' | 'user';
+  role: 'admin' | 'user';
   isActive: boolean;
-  created_at: string;
+  createdAt: string;
 }
 
 export interface LoginResponse {
@@ -103,3 +103,5 @@ export interface PaginationMeta {
   total: number;
   total_pages: number;
 }
+
+

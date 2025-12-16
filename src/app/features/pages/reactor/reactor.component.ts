@@ -62,8 +62,6 @@ export class ReactorComponent {
       }
     });
 
-    effect(() => {});
-
     effect(() => {
       this.applyFilters();
     });

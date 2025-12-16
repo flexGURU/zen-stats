@@ -45,6 +45,12 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard],
   },
+  {
+    path: 'users',
+    loadComponent: () =>
+      import('./pages/user/user.component').then((m) => m.UserComponent),
+    canActivate: [authGuard],
+  },
 
   { path: '**', redirectTo: 'dashboard' },
 ];

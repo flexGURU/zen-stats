@@ -271,7 +271,6 @@ export class BatchExperimentModalComponent {
       payload.timeEnd = this.formatTime(payload.timeEnd) ?? '';
       payload.date = this.formatDate(new Date(payload.date));
     }
-    console.log('payload', payload);
 
     this.loading.set(true);
 

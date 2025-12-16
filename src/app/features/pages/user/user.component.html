@@ -1,0 +1,131 @@
+<div class="max-w-5xl mx-auto px-4 py-6 md:py-10 lg:py-16">
+  @if (users.isError()) {
+  <div class="flex flex-col justify-center items-center">
+    <p-message severity="error"
+      >Error loading Users. Please try again.
+      <p-button
+        size="small"
+        icon="pi pi-refresh"
+        label="Reload"
+        severity="danger"
+        (onClick)="users.refetch()"
+      ></p-button
+    ></p-message>
+  </div>
+  }
+  <div>
+    <div class="flex justify-between">
+      <h1 class="text-3xl font-bold mb-4">Users</h1>
+      <button
+        (click)="mutateUser(null)"
+        pButton
+        type="button"
+        label="Add user"
+        icon="pi pi-plus"
+        class="mb-4"
+      ></button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div class="h-full flex gap-2 justify-end items-center">
+        <button
+          pButton
+          icon="pi pi-refresh"
+          size="small"
+          (click)="users.refetch()"
+          [loading]="users.isLoading()"
+        ></button>
+
+        <button
+          (click)="clearFilters()"
+          pButton
+          type="button"
+          label="Clear Filters"
+          icon="pi pi-times"
+          size="small"
+        ></button>
+      </div>
+    </div>
+
+    <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
+      <p-table
+        [value]="users.data() ?? []"
+        [loading]="users.isLoading()"
+        dataKey="id"
+        size="small"
+        [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
+      >
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="name">
+              Name <p-sortIcon field="name"></p-sortIcon>
+            </th>
+            <th pSortableColumn="email">
+              Email <p-sortIcon field="email"></p-sortIcon>
+            </th>
+            <th pSortableColumn="role">
+              Role <p-sortIcon field="role"></p-sortIcon>
+            </th>
+            <th pSortableColumn="createdAt">
+              Created At <p-sortIcon field="createdAt"></p-sortIcon>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template #body let-user>
+          <tr [pSelectableRow]="user">
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <p-tag
+                rounded="true"
+                [severity]="user.role === 'admin' ? 'danger' : 'info'"
+              >
+                {{ user.role }}
+              </p-tag>
+            </td>
+            <td>{{ user.createdAt | date }}</td>
+
+            <td>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-text p-button-sm"
+                (click)="mutateUser(user)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-text p-button-sm"
+                (click)="deleteUser(user.id)"
+                severity="danger"
+              ></button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <p-dialog
+    maskStyleClass="backdrop-blur-sm"
+    header="user Details"
+    [header]="isEdit() ? 'Edit user' : 'Add New user'"
+    [(visible)]="displayModal"
+    [modal]="true"
+    [style]="{ width: '500px', }"
+    maximizable="true"
+  >
+    <app-user-modal
+      #userModal
+      (closeModal)="displayModal.set(false)"
+      (mutationStatus)="onMutationStatus($event)"
+    />
+  </p-dialog>
+  <p-toast />
+  <p-confirmdialog />
+</div>
