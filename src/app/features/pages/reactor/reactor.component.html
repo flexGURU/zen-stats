@@ -27,53 +27,36 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
       <div>
-        <label
-          for="reactorName"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          reactor Name
-        </label>
-        <input
-          pInputText
+        <p-select
+          [options]="reactors.data() || []"
           id="reactorName"
           [(ngModel)]="reactorName"
+          optionLabel="name"
+          optionValue="name"
+          placeholder="Select Reactor"
           class="w-full"
-          placeholder="reactor Name"
-          type="text"
           pSize="small"
         />
       </div>
       <div>
-        <label
-          for="reactorName"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Status
-        </label>
-        <input
-          pInputText
-          id="status"
+        <p-select
+          [options]="statusOptions() || []"
           [(ngModel)]="status"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Status"
           class="w-full"
-          placeholder="Status"
-          type="text"
           pSize="small"
         />
       </div>
       <div>
-        <label
-          for="reactorName"
-          class="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Pathway
-        </label>
-        <input
-          pInputText
-          id="pathway"
+        <p-select
+          [options]="pathwayOptions() || []"
           [(ngModel)]="pathway"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select Pathway"
           class="w-full"
-          placeholder="Status"
-          type="text"
           pSize="small"
         />
       </div>

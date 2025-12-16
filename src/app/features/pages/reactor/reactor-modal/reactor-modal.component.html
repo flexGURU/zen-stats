@@ -73,14 +73,15 @@
   <div class="mb-4">
     @if (reactorData?.pdfUrl) {
     <div class="flex items-center gap-3 border border-gray-300 rounded-md p-3">
-      <p-tag icon="pi pi-external-link" severity="info">
-        <a
-          href="{{ reactorData?.pdfUrl }}"
-          class="hover:underline"
-          target="_blank"
-          >Reactor File</a
-        > </p-tag
-      ><button
+      <a
+        href="{{ reactorData?.pdfUrl }}"
+        class="text-blue-600 hover:text-blue-800 underline text-sm flex items-center gap-1"
+        target="_blank"
+      >
+        <i class="pi pi-file-pdf"></i>
+        Reactor File</a
+      >
+      <button
         pButton
         severity="warn"
         size="small"

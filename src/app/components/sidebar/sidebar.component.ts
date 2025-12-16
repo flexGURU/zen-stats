@@ -14,7 +14,8 @@ import { Ripple } from 'primeng/ripple';
     ButtonModule,
     RouterLink,
     CommonModule,
-    RouterLinkActive,Ripple
+    RouterLinkActive,
+    Ripple,
   ],
   templateUrl: './sidebar.component.html',
   styles: ``,
@@ -24,9 +25,8 @@ export class SidebarComponent {
   loading = signal(false);
 
   sidebarContent = [
-    { label: 'Profile', icon: 'pi pi-user', route: '/profile' },
     { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
-    { label: 'Device', icon: 'pi pi-tablet', route: '/devices' }, 
+    { label: 'Device', icon: 'pi pi-tablet', route: '/devices' },
     { label: 'Reactor', icon: 'pi pi-cog', route: '/reactors' },
     {
       label: 'Batch Experiment',

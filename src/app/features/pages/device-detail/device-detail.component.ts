@@ -13,7 +13,6 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { deviceDetailQuery } from './device-detail.query';
-import { ChartUpdateData } from '../../../core/models/models';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Message } from 'primeng/message';
 import { Button } from 'primeng/button';
@@ -22,6 +21,20 @@ import { DatePicker } from 'primeng/datepicker';
 import { DividerModule } from 'primeng/divider';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { DeviceDetailService } from './device-detail.service';
+import { DeviceSummary } from '../../../core/models/models';
+
+// Updated interfaces
+export interface DeviceDetail {
+  co2: number;
+  pressure: number;
+  temperature: number;
+  server_timestamp: string;
+}
+
+interface DynamicChartData {
+  labels: string[];
+  datasets: Map<string, number[]>;
+}
 
 @Component({
   selector: 'app-device-detail',
@@ -45,58 +58,43 @@ import { DeviceDetailService } from './device-detail.service';
 export class DeviceDetailComponent {
   deviceId = input.required<string | number>();
   chart!: Chart;
-  ingredient: string = 'Cheese';
   selectedFrequencyOption = signal('');
   deviceData = deviceDetailQuery(this.deviceId).deviceDataQuery;
   deviceInfo = deviceDetailQuery(this.deviceId).deviceInfoQuery;
-  selectedDate = signal<Date | null>(null);
-  startTime = signal<Date | null>(null);
-  endTime = signal<Date | null>(null);
+  selectedDate = signal(null);
+  startTime = signal(null);
+  endTime = signal(null);
 
   items = [{ label: '' }];
   home = { icon: 'pi pi-cog', url: '/devices', label: 'Devices' };
-
   deviceService = inject(DeviceDetailService);
+
+  private colorPalette = [];
 
   constructor() {
     effect(() => {
       this.deviceData.data() ? this.transformDataForChart() : null;
-
       if (this.selectedDate() && this.startTime() && this.endTime()) {
         this.updateFilters();
       }
     });
+    effect(() => {});
   }
 
   ngOnInit(): void {
     this.initChart();
   }
 
-  updateFilters() {
-    const date = this.selectedDate();
-    const start = this.startTime();
-    const end = this.endTime();
-
-    this.deviceService.date.set(date ? date.toISOString().split('T')[0] : '');
-
-    this.deviceService.startTime.set(start ? start.toISOString() : '');
-
-    this.deviceService.endTime.set(end ? end.toISOString() : '');
-
-    this.deviceData.refetch();
-  }
+  updateFilters() {}
 
   clearFilters() {
     this.selectedDate.set(null);
     this.startTime.set(null);
     this.endTime.set(null);
-
     this.deviceService.date.set('');
     this.deviceService.startTime.set('');
     this.deviceService.endTime.set('');
   }
-
-  addQueryParams() {}
 
   refreshData() {
     this.deviceData.refetch();
@@ -110,62 +108,90 @@ export class DeviceDetailComponent {
 
   transformDataForChart() {
     const data = this.deviceData.data();
-    const labels = data?.map((entry) => {
-      return new Date(entry.payload.server_timestamp).toLocaleString();
-    });
+    if (!data || data.length === 0) return;
 
-    if (data && labels) {
-      const tempValues = data.map((entry) => entry.payload.temperature);
-      const co2Values = data.map((entry) => entry.payload.co2);
-      const pressureValues = data?.map((entry) => entry.payload.pressure);
-
-      const chartData: ChartUpdateData = {
-        tempValues,
-        co2Values,
-        pressureValues,
-        labels,
-      };
-      this.updateChart(chartData);
-    }
+    const chartData = this.extractDynamicMeasurements(data);
+    this.updateChart(chartData);
   }
 
-  updateChart = (chartData: ChartUpdateData) => {
-    const { labels, co2Values, pressureValues, tempValues } = chartData;
+  extractDynamicMeasurements(data: DeviceSummary[]): DynamicChartData {
+    const labels: string[] = [];
+    const datasets = new Map<string, number[]>();
+
+    data.forEach((entry) => {
+      const time = new Date(entry.timestamp).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true,
+      });
+      labels.push(time);
+
+      let measurement = entry.payload;
+      Object.keys(measurement).forEach((key) => {
+        if (key.toLowerCase().includes('timestamp') || key === 'id') {
+          return;
+        }
+
+        const value = measurement[key];
+
+        if (typeof value === 'number') {
+          if (!datasets.has(key)) {
+            datasets.set(key, []);
+          }
+          datasets.get(key)!.push(value);
+        }
+      });
+    });
+
+    const expectedLength = labels.length;
+    datasets.forEach((values, key) => {
+      while (values.length < expectedLength) {
+        values.push(null as any);
+      }
+    });
+
+    return { labels, datasets };
+  }
+
+  updateChart(chartData: DynamicChartData): void {
+    const { labels, datasets } = chartData;
+
     this.chart.data.labels = labels;
-    this.chart.data.datasets[0].data = co2Values;
-    this.chart.data.datasets[1].data = pressureValues;
-    this.chart.data.datasets[2].data = tempValues;
+
+    this.chart.data.datasets = [];
+
+    let colorIndex = 0;
+    datasets.forEach((values, measurementName) => {
+      this.chart.data.datasets.push({
+        label: this.formatLabel(measurementName),
+        data: values,
+        fill: false,
+        borderColor: this.colorPalette[colorIndex % this.colorPalette.length],
+        tension: 0.3,
+      });
+      colorIndex++;
+    });
+
     this.chart.update();
-  };
+  }
+
+  formatLabel(key: string): string {
+    return key
+      .replace(/([A-Z])/g, ' $1')
+      .replace(/_/g, ' ')
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+      .trim();
+  }
 
   initChart(): void {
     this.chart = new chart('deviceChart', {
       type: 'line',
       data: {
         labels: [],
-        datasets: [
-          {
-            label: 'CO2',
-            data: [],
-            fill: false,
-            borderColor: 'rgb(220, 20, 60)',
-            tension: 0.3,
-          },
-          {
-            label: 'Pressure',
-            data: [],
-            fill: false,
-            borderColor: 'rgb(30, 144, 255)',
-            tension: 0.3,
-          },
-          {
-            label: 'Temperature',
-            data: [],
-            fill: false,
-            borderColor: 'rgb(34, 139, 34)',
-            tension: 0.3,
-          },
-        ],
+        datasets: [],
       },
       options: {
         responsive: true,
@@ -176,6 +202,11 @@ export class DeviceDetailComponent {
           title: {
             display: true,
             text: 'Device Data Over Time',
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
           },
         },
       },

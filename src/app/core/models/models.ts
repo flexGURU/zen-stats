@@ -6,9 +6,9 @@ export interface DeviceDetail {
 }
 
 export interface DeviceSummary {
-  id: string | number;
   device_id: string;
-  payload: DeviceDetail;
+  timestamp: string;
+  payload: Record<string, string | number>;
 }
 
 export interface ChartUpdateData {
@@ -90,4 +90,16 @@ export interface BatchExperiment {
   analyticalTests: AnalyticalTest[];
   deletedAt: string | null;
   createdAt: string;
+}
+
+
+export interface PaginationMeta {
+  has_next: boolean;
+  has_previous: boolean;
+  next_page: number | null;
+  previous_page: number | null;
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
 }

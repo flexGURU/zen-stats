@@ -11,4 +11,17 @@ export class DashboardService {
   private readonly apiUrl = environment.APIURL;
 
   private http = inject(HttpClient);
+
+  getDashboardStats = (): Observable<Record<string, number>> => {
+    return this.http
+      .get<{ data: Record<string, number> }>(`${this.apiUrl}/dashboard/stats`)
+      .pipe(
+        map((response) => response.data),
+        catchError((error) => {
+          console.error('Error fetching dashboard stats:', error);
+          throw new Error('Failed to fetch dashboard stats');
+        })
+      );
+  };
+  
 }
