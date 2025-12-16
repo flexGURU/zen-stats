@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Edwin9301/Zen/backend/internal/postgres"
+	"github.com/Edwin9301/Zen/backend/internal/services"
 	"github.com/Edwin9301/Zen/backend/pkg"
 	"github.com/gin-gonic/gin"
 )
@@ -22,9 +23,11 @@ type Server struct {
 	repo       *postgres.PostgresRepo
 
 	email pkg.EmailSender
+
+	report services.ReportService
 }
 
-func NewServer(config pkg.Config, tokenMaker pkg.JWTMaker, repo *postgres.PostgresRepo) *Server {
+func NewServer(config pkg.Config, tokenMaker pkg.JWTMaker, repo *postgres.PostgresRepo, report services.ReportService) *Server {
 	if config.ENVIRONMENT == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -42,6 +45,8 @@ func NewServer(config pkg.Config, tokenMaker pkg.JWTMaker, repo *postgres.Postgr
 		repo:       repo,
 
 		email: emailSender,
+
+		report: report,
 	}
 
 	s.setUpRoutes()
@@ -105,6 +110,9 @@ func (s *Server) setUpRoutes() {
 	v1.POST("/readings/:id", s.createSensorReadingHandler)
 	v1.GET("/readings/:id", s.getSensorReadingByIDHandler)
 	v1.GET("/readings", s.listSensorReadingsHandler)
+
+	// reports routes
+	authGroup.POST("/reports/readings", s.generateReadingReportHandler)
 
 	// helpers routes
 	authGroup.GET("/dashboard/stats", s.getDashboardStatsHandler)

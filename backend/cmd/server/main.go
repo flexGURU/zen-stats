@@ -10,6 +10,7 @@ import (
 
 	"github.com/Edwin9301/Zen/backend/internal/handlers"
 	"github.com/Edwin9301/Zen/backend/internal/postgres"
+	"github.com/Edwin9301/Zen/backend/internal/reports"
 	"github.com/Edwin9301/Zen/backend/pkg"
 )
 
@@ -37,8 +38,10 @@ func main() {
 	// initialize repository
 	postgresRepo := postgres.NewPostgresRepo(store)
 
+	report := reports.NewReportService(postgresRepo)
+
 	// start server
-	server := handlers.NewServer(config, tokenMaker, postgresRepo)
+	server := handlers.NewServer(config, tokenMaker, postgresRepo, report)
 	log.Println("starting server at address: ", config.SERVER_ADDRESS)
 	if err := server.Start(); err != nil {
 		log.Fatalf("Error starting server: %v", err)
