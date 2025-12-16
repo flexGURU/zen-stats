@@ -15,7 +15,8 @@ const countListUsers = `-- name: CountListUsers :one
 SELECT COUNT(*) AS total_users
 FROM users
 WHERE 
-    (
+    deleted_at IS NULL
+    AND (
         COALESCE($1, '') = '' 
         OR LOWER(name) LIKE $1
         OR LOWER(email) LIKE $1
@@ -46,9 +47,9 @@ func (q *Queries) CountListUsers(ctx context.Context, arg CountListUsersParams) 
 
 const countTotalInactiveActiveUsers = `-- name: CountTotalInactiveActiveUsers :one
 SELECT
-    (SELECT COUNT(*) FROM users) AS total_users,
-    (SELECT COUNT(*) FROM users WHERE is_active = true) AS active_users,
-    (SELECT COUNT(*) FROM users WHERE is_active = false) AS inactive_users
+    (SELECT COUNT(*) FROM users WHERE deleted_at IS NULL) AS total_users,
+    (SELECT COUNT(*) FROM users WHERE is_active = true AND deleted_at IS NULL) AS active_users,
+    (SELECT COUNT(*) FROM users WHERE is_active = false AND deleted_at IS NULL) AS inactive_users
 `
 
 type CountTotalInactiveActiveUsersRow struct {
@@ -74,7 +75,7 @@ VALUES (
     $5,
     $6
 )
-RETURNING id, name, email, phone_number, password, role, is_active, refresh_token, created_at
+RETURNING id, name, email, phone_number, password, role, is_active, refresh_token, created_at, deleted_at
 `
 
 type CreateUserParams struct {
@@ -106,13 +107,25 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.IsActive,
 		&i.RefreshToken,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
 
+const deleteUser = `-- name: DeleteUser :exec
+UPDATE users
+SET deleted_at = NOW()
+WHERE id = $1 AND deleted_at IS NULL
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, deleteUser, id)
+	return err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, phone_number, password, role, is_active, refresh_token, created_at FROM users
-WHERE email = $1
+SELECT id, name, email, phone_number, password, role, is_active, refresh_token, created_at, deleted_at FROM users
+WHERE email = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
@@ -128,13 +141,14 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.IsActive,
 		&i.RefreshToken,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, email, phone_number, password, role, is_active, refresh_token, created_at FROM users
-WHERE id = $1
+SELECT id, name, email, phone_number, password, role, is_active, refresh_token, created_at, deleted_at FROM users
+WHERE id = $1 AND deleted_at IS NULL
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
@@ -150,6 +164,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id int64) (User, error) {
 		&i.IsActive,
 		&i.RefreshToken,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
@@ -181,9 +196,10 @@ func (q *Queries) GetUserRefreshTokenByID(ctx context.Context, id int64) (pgtype
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, name, email, phone_number, password, role, is_active, refresh_token, created_at FROM users
+SELECT id, name, email, phone_number, password, role, is_active, refresh_token, created_at, deleted_at FROM users
 WHERE 
-    (
+    deleted_at IS NULL
+    AND (
         COALESCE($1, '') = '' 
         OR LOWER(name) LIKE $1
         OR LOWER(email) LIKE $1
@@ -234,6 +250,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.IsActive,
 			&i.RefreshToken,
 			&i.CreatedAt,
+			&i.DeletedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -252,8 +269,8 @@ SET name = coalesce($1, name),
     phone_number = coalesce($3, phone_number),
     role = coalesce($4, role),
     is_active = coalesce($5, is_active)
-WHERE id = $6
-RETURNING id, name, email, phone_number, password, role, is_active, refresh_token, created_at
+WHERE id = $6 AND deleted_at IS NULL
+RETURNING id, name, email, phone_number, password, role, is_active, refresh_token, created_at, deleted_at
 `
 
 type UpdateUserParams struct {
@@ -285,6 +302,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.IsActive,
 		&i.RefreshToken,
 		&i.CreatedAt,
+		&i.DeletedAt,
 	)
 	return i, err
 }
@@ -292,7 +310,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 const updateUserPassword = `-- name: UpdateUserPassword :exec
 UPDATE users
 SET password = $2
-WHERE id = $1
+WHERE id = $1 AND deleted_at IS NULL
 `
 
 type UpdateUserPasswordParams struct {

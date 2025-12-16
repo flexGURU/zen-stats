@@ -55,6 +55,7 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, updateUser *UpdateUser) error
 	UpdateUserPassword(ctx context.Context, userID uint32, hashedPassword string) error
 	ListUsers(ctx context.Context, filter *FilterUsers) ([]*User, *pkg.Pagination, error)
+	DeleteUser(ctx context.Context, userID uint32) error
 
 	// internal use only
 	GetUserPassword(ctx context.Context, email string) (string, error)

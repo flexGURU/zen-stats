@@ -174,6 +174,21 @@ func (s *Server) updateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"data": "user updated successfully"})
 }
 
+func (s *Server) deleteUser(ctx *gin.Context) {
+	id, err := pkg.StrToUint32(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(pkg.ErrorToStatusCode(err), errorResponse(err))
+		return
+	}
+
+	if err := s.repo.UserRepository.DeleteUser(ctx, id); err != nil {
+		ctx.JSON(pkg.ErrorToStatusCode(err), errorResponse(err))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"data": "user deleted successfully"})
+}
+
 func (s *Server) listUsers(ctx *gin.Context) {
 	pageNoStr := ctx.DefaultQuery("page", "1")
 	pageNo, err := pkg.StrToUint32(pageNoStr)

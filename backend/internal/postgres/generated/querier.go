@@ -27,6 +27,7 @@ type Querier interface {
 	DeleteDevice(ctx context.Context, id int64) error
 	DeleteExperiment(ctx context.Context, id int64) error
 	DeleteReactor(ctx context.Context, id int64) error
+	DeleteUser(ctx context.Context, id int64) error
 	GetAverageExperimentDuration(ctx context.Context) (float64, error)
 	GetDevice(ctx context.Context, id int64) (Device, error)
 	GetDeviceReadings(ctx context.Context, arg GetDeviceReadingsParams) ([]SensorReading, error)

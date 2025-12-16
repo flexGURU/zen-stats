@@ -107,6 +107,13 @@ func (u *UserRepository) UpdateUser(ctx context.Context, updateUser *repository.
 	return nil
 }
 
+func (u *UserRepository) DeleteUser(ctx context.Context, userID uint32) error {
+	if err := u.queries.DeleteUser(ctx, int64(userID)); err != nil {
+		return pkg.Errorf(pkg.INTERNAL_ERROR, "failed to delete user: %v", err)
+	}
+	return nil
+}
+
 func (u *UserRepository) UpdateUserPassword(ctx context.Context, userID uint32, hashedPassword string) error {
 	if err := u.queries.UpdateUserPassword(ctx, generated.UpdateUserPasswordParams{
 		ID:       int64(userID),

@@ -83,6 +83,7 @@ func (s *Server) setUpRoutes() {
 	authGroup.GET("/users/:id", s.getUser)
 	adminGroup.GET("/users", s.listUsers)
 	authGroup.PUT("/users/:id", s.updateUser)
+	authGroup.DELETE("/users/:id", s.deleteUser)
 
 	// experiment routes
 	adminGroup.POST("/experiments", s.createExperiment)

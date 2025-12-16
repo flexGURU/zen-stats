@@ -77,11 +77,21 @@
 				{
 					"name": "Create User",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Emilio Cliff\",\n    \"email\": \"emiliocliff@gmail.com\",\n    \"role\": \"admin\",\n    \"isActive\": true\n}",
+							"raw": "{\n    \"name\": \"Emilio Cliff\",\n    \"email\": \"emiliocliffq@gmail.com\",\n    \"role\": \"admin\",\n    \"isActive\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -127,7 +137,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "1"
+									"value": "6"
 								}
 							]
 						}
@@ -282,6 +292,40 @@
 								{
 									"key": "token",
 									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgyZmJhYTY5LWQwMGEtMTFmMC04ZTlhLWQ0YzllZmU5MDE4YSIsInVzZXJfaWQiOjEsIm5hbWUiOiJFbWlsaW8gQ2xpZmYiLCJlbWFpbCI6ImVtaWxpb2NsaWZmQGdtYWlsLmNvbSIsInJvbGUiOiJhZG1pbiIsImlzcyI6IlpFTl9CQUNLRU5EIiwiZXhwIjoxNzY0NzQwNDYxLCJpYXQiOjE3NjQ3NDA0MDF9.xQD9uvMupnEKS4em-C0ubn46bK-ZLNx91NGb-tf-YDw"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "6"
 								}
 							]
 						}

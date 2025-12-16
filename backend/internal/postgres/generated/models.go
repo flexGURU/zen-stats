@@ -97,13 +97,14 @@ type SensorReading struct {
 }
 
 type User struct {
-	ID           int64       `json:"id"`
-	Name         string      `json:"name"`
-	Email        string      `json:"email"`
-	PhoneNumber  pgtype.Text `json:"phone_number"`
-	Password     string      `json:"password"`
-	Role         Role        `json:"role"`
-	IsActive     bool        `json:"is_active"`
-	RefreshToken pgtype.Text `json:"refresh_token"`
-	CreatedAt    time.Time   `json:"created_at"`
+	ID           int64              `json:"id"`
+	Name         string             `json:"name"`
+	Email        string             `json:"email"`
+	PhoneNumber  pgtype.Text        `json:"phone_number"`
+	Password     string             `json:"password"`
+	Role         Role               `json:"role"`
+	IsActive     bool               `json:"is_active"`
+	RefreshToken pgtype.Text        `json:"refresh_token"`
+	CreatedAt    time.Time          `json:"created_at"`
+	DeletedAt    pgtype.Timestamptz `json:"deleted_at"`
 }
