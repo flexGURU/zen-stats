@@ -45,6 +45,7 @@ import { TagModule } from 'primeng/tag';
 })
 export class ReactorModalComponent {
   reactorForm!: FormGroup;
+  readonly = input(false);
 
   visible = model(false);
   isEditMode = model(false);
@@ -71,7 +72,9 @@ export class ReactorModalComponent {
 
   constructor() {
     this.initialiseForm();
-    effect(() => {});
+    effect(() => {
+      if (this.readonly()) this.reactorForm.disable();
+    });
   }
 
   initialiseForm() {

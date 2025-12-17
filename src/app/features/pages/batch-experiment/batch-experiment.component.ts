@@ -14,6 +14,7 @@ import { batchExperimentQuery } from './batch-experiment.query';
 import { BatchExperiment } from '../../../core/models/models';
 import { BatchExperimentService } from './batch-experiment.service';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+import { RoleAuthService } from '../../../core/utils/role-auth.service';
 
 @Component({
   selector: 'app-batch-experiment',
@@ -50,6 +51,8 @@ export class BatchExperimentComponent {
   date = signal<Date | null>(null);
 
   private batchExperimentService = inject(BatchExperimentService);
+  private _hasPermission = inject(RoleAuthService).hasPermission;
+
   pageSize = this.batchExperimentService.pageSize;
   totalRecords = this.batchExperimentService.total;
   first = signal(0);
@@ -66,6 +69,10 @@ export class BatchExperimentComponent {
       this.applyFilters();
     });
   }
+
+  checkPermsission = (action: string): boolean => {
+    return this._hasPermission(action);
+  };
 
   onPageChange(event: PaginatorState) {
     this.batchExperimentService.limit.set(event.rows ?? 10);

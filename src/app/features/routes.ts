@@ -50,7 +50,15 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/user/user.component').then((m) => m.UserComponent),
     canActivate: [authGuard],
+    data: { roles: 'admin' },
   },
-
+  {
+    path: 'no-permission',
+    loadComponent: () =>
+      import('./pages/no-permission/no-permission.component').then(
+        (m) => m.NoPermissionComponent
+      ),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: 'dashboard' },
 ];
