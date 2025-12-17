@@ -510,6 +510,7 @@
                 accept=".pdf"
                 maxFileSize="1000000"
                 (onSelect)="onFileSelect($event, i)"
+                [disabled]="readonly()"
               >
               </p-fileUpload>
               }
@@ -523,6 +524,7 @@
               label="Remove"
               class="p-button-danger p-button-sm"
               (click)="removeAnalyticalTest(i)"
+              [disabled]="readonly()"
             ></button>
           </div>
         </div>
@@ -536,6 +538,7 @@
         icon="pi pi-plus"
         class="mt-4"
         (click)="addAnalyticalTest()"
+        [disabled]="readonly()"
       ></button>
     </div>
   </div>
@@ -546,6 +549,7 @@
       type="submit"
       [disabled]="experimentForm.invalid"
       [loading]="loading()"
+      [disabled]="readonly()"
     ></p-button>
   </div>
 </form>

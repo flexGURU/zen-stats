@@ -23,6 +23,7 @@
         label="Add Device"
         icon="pi pi-plus"
         class="mb-4"
+        [disabled]="!checkPermission('create')"
       ></button>
     </div>
     <div
@@ -140,6 +141,7 @@
                 class="p-button-text"
                 severity="danger"
                 icon="pi pi-trash"
+                [disabled]="!checkPermission('delete')"
               ></button>
             </td>
             <td>
@@ -191,6 +193,7 @@
   <app-device-modal
     [deviceData]="selectedDevice()"
     (mutationStatus)="onCreateDevice($event)"
+    [readonly]="!checkPermission('edit')"
   />
 </p-dialog>
 <p-toast />

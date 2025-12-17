@@ -18,6 +18,7 @@ import { ReactorService } from './reactor.service';
 import { TagModule } from 'primeng/tag';
 import { SelectModule } from 'primeng/select';
 import { pathwayOptions, statusOptions } from '../../../core/utils/options';
+import { RoleAuthService } from '../../../core/utils/role-auth.service';
 
 @Component({
   selector: 'app-reactor',
@@ -54,6 +55,7 @@ export class ReactorComponent {
   reactors = reactorQuery().reactorData;
 
   private reactorService = inject(ReactorService);
+  private _hasPermission = inject(RoleAuthService).hasPermission;
 
   constructor() {
     effect(() => {
@@ -67,6 +69,9 @@ export class ReactorComponent {
     });
   }
 
+  checkPermission = (action: string): boolean => {
+    return this._hasPermission(action);
+  };
   applyFilters() {
     this.reactorService.search.set(this.reactorName());
     this.reactorService.status.set(this.status());

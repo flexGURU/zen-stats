@@ -16,7 +16,8 @@ export class UserService {
     return this.http.get<{ data: User[] }>(`${this.apiUrl}/users`).pipe(
       map((response) => response.data),
       catchError((error) => {
-        throw new Error(`Error fetching users: ${error.message}`);
+        console.error('Error fetching users:', error);
+        throw new Error(`Error fetching users: ${error.error.message}`);
       })
     );
   };
@@ -25,18 +26,20 @@ export class UserService {
     return this.http.post<{ data: User }>(`${this.apiUrl}/users`, user).pipe(
       map((response) => response.data),
       catchError((error) => {
-        throw new Error(`Error creating user: ${error.message}`);
+        console.error('Error creating user:', error);
+        throw new Error(`Error creating user: ${error.error.message}`);
       })
     );
   };
 
-  updateUser = (id: string | number, user: User): Observable<User> => {
+  updateUser = (id: string | number, user: Partial<User>): Observable<User> => {
     return this.http
       .put<{ data: User }>(`${this.apiUrl}/users/${id}`, user)
       .pipe(
         map((response) => response.data),
         catchError((error) => {
-          throw new Error(`Error updating user: ${error.message}`);
+          console.error('Error updating user:', error);
+          throw new Error(`Error updating user: ${error.error.message}`);
         })
       );
   };
@@ -44,7 +47,8 @@ export class UserService {
   deleteUser = (id: string | number): Observable<void> => {
     return this.http.delete<void>(`${this.apiUrl}/users/${id}`).pipe(
       catchError((error) => {
-        throw new Error(`Error deleting user: ${error.message}`);
+        console.error('Error deleting user:', error);
+        throw new Error(`Error deleting user: ${error.error.message}`);
       })
     );
   };

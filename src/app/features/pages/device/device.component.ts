@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MessageModule } from 'primeng/message';
@@ -22,6 +22,9 @@ import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { UserService } from '../user/user.service';
+import { AuthService } from '../login/auth.service';
+import { RoleAuthService } from '../../../core/utils/role-auth.service';
 
 @Component({
   selector: 'app-device',
@@ -41,8 +44,8 @@ import { InputTextModule } from 'primeng/inputtext';
     TagModule,
     FormsModule,
     InputTextModule,
-    RouterLink
-],
+    RouterLink,
+  ],
   templateUrl: './device.component.html',
   providers: [MessageService, ConfirmationService],
 })
@@ -59,6 +62,8 @@ export class DeviceComponent {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private deleteDeviceService = inject(DeviceService).deleteDevice;
+  private currentUser = inject(AuthService).currentUser;
+  private _hasPermission = inject(RoleAuthService).hasPermission;
 
   constructor() {
     effect(() => {
@@ -72,6 +77,10 @@ export class DeviceComponent {
     this.selectedDevice.set(device);
     this.displayModal.set(true);
   }
+
+  checkPermission = (action: string): boolean => {
+    return this._hasPermission(action);
+  };
 
   deleteDevice(deviceId: string) {
     this.confirmationService.confirm({

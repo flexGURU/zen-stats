@@ -36,6 +36,8 @@ export class DeviceModalComponent {
   ]);
   loading = signal(false);
 
+  readonly = input(false);
+
   private fb = inject(FormBuilder);
   private deviceService = inject(DeviceService);
 
@@ -101,10 +103,9 @@ export class DeviceModalComponent {
           });
         },
         error: (error) => {
-          console.error('Error creating device:', error);
           this.mutationStatus.emit({
             status: false,
-            detail: 'Error creating device',
+            detail: error,
           });
         },
       });
@@ -124,7 +125,7 @@ export class DeviceModalComponent {
           console.error('Error updating device:', error);
           this.mutationStatus.emit({
             status: false,
-            detail: 'Error updating device',
+            detail: error,
           });
         },
       });

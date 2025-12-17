@@ -55,6 +55,7 @@ export class BatchExperimentModalComponent {
 
   modalVisible = model(false);
   reactors = reactorQuery().reactorData;
+  readonly = input(false);
 
   co2Forms = signal([
     { label: 'Gaseous', value: 'gaseous' },
@@ -72,6 +73,12 @@ export class BatchExperimentModalComponent {
 
   constructor() {
     this.initializeForm();
+    effect(() => {
+      if (this.readonly()) {
+        this.experimentForm.disable();
+        this.analyticalTests.disable();
+      }
+    });
   }
 
   private batchExperimentService = inject(BatchExperimentService);
@@ -343,16 +350,6 @@ export class BatchExperimentModalComponent {
     const minutes = String(d.getMinutes()).padStart(2, '0');
 
     return `${hours}:${minutes}`;
-  }
-
-  private shortenDate(date: string | Date): string {
-    const d = new Date(date);
-
-    const day = String(d.getDate()).padStart(2, '0');
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
-
-    return `${day}/${month}/${year}`;
   }
 
   private formatDate(date: Date): Date {

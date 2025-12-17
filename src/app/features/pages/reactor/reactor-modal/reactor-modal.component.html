@@ -89,6 +89,7 @@
         (click)="removeFile()"
         [loading]="removeLoading()"
         type="button"
+        [disabled]="readonly()"
       >
         Remove
       </button>
@@ -111,5 +112,6 @@
     label="Submit"
     [disabled]="reactorForm.invalid"
     [loading]="loading()"
+    [disabled]="readonly()"
   ></button>
 </form>

@@ -13,6 +13,7 @@
           label="Add Batch"
           icon="pi pi-plus"
           class="mb-4"
+          [disabled]="!checkPermsission('create')"
         ></button>
       </div>
     </div>
@@ -65,70 +66,71 @@
 
   <div class="border rounded-2xl border-gray-200 pb-4 mb-6">
     <p-table
-  [value]="batchExperiments.data() || []"
-  dataKey="id"
-  [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
-  size="small"
-  [loading]="batchExperiments.isLoading()"
->
-  <ng-template #header>
-    <tr>
-      <th style="width: 3rem"></th>
-      <th>Batch ID</th>
-      <th>Operator</th>
-      <th>Reactor ID</th>
-      <th>Block ID</th>
-      <th>Actions</th>
-    </tr>
-  </ng-template>
-  <ng-template #body let-experiment let-rowIndex="rowIndex">
-    <tr [pSelectableRow]="experiment">
-      <td>
-        <span class="font-semibold text-gray-600">{{ rowIndex + 1 }}</span>
-      </td>
-      <td>{{ experiment.batchId }}</td>
-      <td>{{ experiment.operator }}</td>
-      <td>{{ experiment.reactorId }}</td>
-      <td>{{ experiment.blockId }}</td>
+      [value]="batchExperiments.data() || []"
+      dataKey="id"
+      [tableStyle]="{ 'min-width': '50rem', padding: '1rem' }"
+      size="small"
+      [loading]="batchExperiments.isLoading()"
+    >
+      <ng-template #header>
+        <tr>
+          <th style="width: 3rem"></th>
+          <th>Batch ID</th>
+          <th>Operator</th>
+          <th>Reactor ID</th>
+          <th>Block ID</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-experiment let-rowIndex="rowIndex">
+        <tr [pSelectableRow]="experiment">
+          <td>
+            <span class="font-semibold text-gray-600">{{ rowIndex + 1 }}</span>
+          </td>
+          <td>{{ experiment.batchId }}</td>
+          <td>{{ experiment.operator }}</td>
+          <td>{{ experiment.reactorId }}</td>
+          <td>{{ experiment.blockId }}</td>
 
-      <td>
-        <button
-          (click)="editBatchExperiment(experiment)"
-          pButton
-          type="button"
-          class="p-button-text"
-          icon="pi pi-pencil"
-        ></button>
-        <button
-          (click)="deleteBatchExperiment(experiment.id)"
-          pButton
-          type="button"
-          class="p-button-text"
-          severity="danger"
-          icon="pi pi-trash"
-        ></button>
-      </td>
-    </tr>
-  </ng-template>
-  <ng-template #emptymessage>
-    <tr>
-      <td colspan="6">
-        <span class="flex flex-col items-center justify-center gap-3 py-6">
-          No Reactors found.
-          <button
-            pButton
-            type="button"
-            label="Refresh"
-            icon="pi pi-refresh"
-            size="small"
-            [loading]="batchExperiments.isLoading()"
-            (click)="batchExperiments.refetch()"
-          ></button>
-        </span>
-      </td>
-    </tr>
-  </ng-template>
-</p-table>
+          <td>
+            <button
+              (click)="editBatchExperiment(experiment)"
+              pButton
+              type="button"
+              class="p-button-text"
+              icon="pi pi-pencil"
+            ></button>
+            <button
+              (click)="deleteBatchExperiment(experiment.id)"
+              pButton
+              type="button"
+              class="p-button-text"
+              severity="danger"
+              icon="pi pi-trash"
+              [disabled]="!checkPermsission('delete')"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">
+            <span class="flex flex-col items-center justify-center gap-3 py-6">
+              No Reactors found.
+              <button
+                pButton
+                type="button"
+                label="Refresh"
+                icon="pi pi-refresh"
+                size="small"
+                [loading]="batchExperiments.isLoading()"
+                (click)="batchExperiments.refetch()"
+              ></button>
+            </span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   </div>
 
   @if((batchExperiments.data()?.length ?? 0) > 9){
@@ -157,6 +159,7 @@
     #batchExperimentModal
     (mutationStatus)="onMutateExperiment($event)"
     (closeModal)="displayModal.set(false)"
+    [readonly]="!checkPermsission('edit')"
   />
 </p-dialog>
 <p-toast />
