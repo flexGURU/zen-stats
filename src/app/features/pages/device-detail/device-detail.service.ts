@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
-import { catchError, Observable, map } from 'rxjs';
+import { catchError, Observable, map, tap } from 'rxjs';
 import {
   Device,
   DeviceDetail,
@@ -56,4 +56,27 @@ export class DeviceDetailService {
         })
       );
   }
+
+  exportData = (
+    deviceId: string | number,
+    start: Date,
+    end: Date
+  ): Observable<Blob> => {
+    let payload = {
+      deviceId: Number(deviceId),
+      start: start.toISOString(),
+      end: end.toISOString(),
+    };
+
+    return this.http
+      .post(`${this.apiUrl}/reports/readings`, payload, {
+        responseType: 'blob',
+      })
+      .pipe(
+        catchError((error) => {
+          console.error('Export error:', error);
+          throw new Error(`Error exporting device data`);
+        })
+      );
+  };
 }

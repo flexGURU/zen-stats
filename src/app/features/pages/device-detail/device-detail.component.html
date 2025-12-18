@@ -50,59 +50,53 @@
         <div
           class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200 space-y-5"
         >
-          <h3 class="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
-
-          <div class="flex flex-col space-y-2">
-            <label class="text-gray-700 font-medium text-sm">Date</label>
-            <p-datepicker
-              [(ngModel)]="selectedDate"
-              [showClear]="true"
-              size="small"
-              placeholder="Select Date"
-            />
-          </div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">Exporter</h3>
 
           <p-divider type="dashed" />
 
           <div class="space-y-3">
-            <label class="text-gray-700 font-medium text-sm block"
-              >Time Range</label
-            >
-
             <div class="flex flex-col gap-3">
               <div class="flex flex-col space-y-1">
-                <span class="text-xs text-gray-500">Start Time</span>
+                <span class="text-xs text-gray-500">Start </span>
                 <p-datepicker
-                  [(ngModel)]="startTime"
-                  [timeOnly]="true"
-                  placeholder="Start Time"
+                  [(ngModel)]="start"
+                  placeholder="Start"
+                  [showTime]="true"
+                  [hourFormat]="'24'"
                   class="w-full"
                   size="small"
+                  [showClear]="true"
                 ></p-datepicker>
               </div>
 
               <div class="flex flex-col space-y-1">
-                <span class="text-xs text-gray-500">End Time</span>
+                <span class="text-xs text-gray-500">End </span>
                 <p-datepicker
-                  [(ngModel)]="endTime"
-                  [timeOnly]="true"
-                  placeholder="End Time"
+                  [(ngModel)]="end"
+                  [showTime]="true"
+                  [hourFormat]="'24'"
+                  placeholder="End"
                   class="w-full"
                   size="small"
+                  [showClear]="true"
                 ></p-datepicker>
               </div>
-            </div>
-          </div>
 
-          <div class="pt-2">
-            <p-button
-              label="Clear Filters"
-              icon="pi pi-times"
-              size="small"
-              class="w-full"
-              [outlined]="true"
-              (onClick)="clearFilters()"
-            ></p-button>
+              <button
+                pButton
+                label="Export Data"
+                icon="pi pi-download"
+                class="w-full"
+                (click)="exportData()"
+                [loading]="loading()"
+              ></button>
+
+              @if (emptyFilters()) {
+              <p-message severity="error" class="text-sm"
+                >Please select start and end date/time for export.</p-message
+              >
+              }
+            </div>
           </div>
         </div>
 
@@ -150,3 +144,4 @@
     </div>
   </div>
 </div>
+<p-toast />

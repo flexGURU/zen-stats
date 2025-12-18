@@ -15,13 +15,16 @@ import { FormsModule } from '@angular/forms';
 import { deviceDetailQuery } from './device-detail.query';
 import { ProgressSpinner } from 'primeng/progressspinner';
 import { Message } from 'primeng/message';
-import { Button } from 'primeng/button';
+import { Button, ButtonDirective } from 'primeng/button';
 import { EmptyStateComponent } from '../../components/empty-state/empty-state.component';
 import { DatePicker } from 'primeng/datepicker';
 import { DividerModule } from 'primeng/divider';
 import { Breadcrumb } from 'primeng/breadcrumb';
 import { DeviceDetailService } from './device-detail.service';
 import { DeviceSummary } from '../../../core/models/models';
+import { finalize } from 'rxjs';
+import { MessageService } from 'primeng/api';
+import { Toast } from "primeng/toast";
 
 // Updated interfaces
 export interface DeviceDetail {
@@ -39,7 +42,6 @@ interface DynamicChartData {
 @Component({
   selector: 'app-device-detail',
   imports: [
-    SensorValueComponent,
     SelectModule,
     RadioButtonModule,
     CommonModule,
@@ -51,9 +53,12 @@ interface DynamicChartData {
     EmptyStateComponent,
     DividerModule,
     Breadcrumb,
-  ],
+    ButtonDirective,
+    Toast
+],
   templateUrl: './device-detail.component.html',
   styles: ``,
+  providers: [MessageService],
 })
 export class DeviceDetailComponent {
   deviceId = input.required<string | number>();
@@ -61,20 +66,25 @@ export class DeviceDetailComponent {
   selectedFrequencyOption = signal('');
   deviceData = deviceDetailQuery(this.deviceId).deviceDataQuery;
   deviceInfo = deviceDetailQuery(this.deviceId).deviceInfoQuery;
-  selectedDate = signal(null);
-  startTime = signal(null);
-  endTime = signal(null);
+  selectedDate = signal<Date | null>(null);
+  start = signal<Date | null>(null);
+  end = signal<Date | null>(null);
+  emptyFilters = signal(false);
+
+  loading = signal(false);
 
   items = [{ label: '' }];
   home = { icon: 'pi pi-cog', url: '/devices', label: 'Devices' };
-  deviceService = inject(DeviceDetailService);
+
+  private deviceService = inject(DeviceDetailService);
+  private messageService = inject(MessageService);
 
   private colorPalette = [];
 
   constructor() {
     effect(() => {
       this.deviceData.data() ? this.transformDataForChart() : null;
-      if (this.selectedDate() && this.startTime() && this.endTime()) {
+      if (this.selectedDate() && this.start() && this.end()) {
         this.updateFilters();
       }
     });
@@ -89,8 +99,8 @@ export class DeviceDetailComponent {
 
   clearFilters() {
     this.selectedDate.set(null);
-    this.startTime.set(null);
-    this.endTime.set(null);
+    this.start.set(null);
+    this.end.set(null);
     this.deviceService.date.set('');
     this.deviceService.startTime.set('');
     this.deviceService.endTime.set('');
@@ -211,5 +221,41 @@ export class DeviceDetailComponent {
         },
       },
     });
+  }
+
+  exportData = () => {
+    if (!this.start() || !this.end()) {
+      this.emptyFilters.set(true);
+      return;
+    }
+    this.emptyFilters.set(false);
+    this.loading.set(true);
+    this.deviceService
+      .exportData(this.deviceId(), this.start()!, this.end()!)
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (blob) => {
+          const filename = `device_${this.deviceId()}_report.xlsx`;
+          this.downloadExcelFile(blob, filename);
+        },
+        error: (error) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Export Error',
+            detail: error,
+          });
+        },
+      });
+  };
+
+  private downloadExcelFile(blob: Blob, filename: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   }
 }
