@@ -15,7 +15,7 @@ export class DeviceService {
     return this.http.get<{ data: Device[] }>(`${this.apiUrl}/devices`).pipe(
       map((response) => response.data),
       catchError((err) => {
-        throw new Error(err);
+        throw new Error(`Error fetching devices: ${err.error.message}`);
       })
     );
   };
@@ -26,7 +26,8 @@ export class DeviceService {
       .pipe(
         map((response) => response.data),
         catchError((err) => {
-          throw new Error(err);
+          console.error('Error creating device:', err);
+          throw new Error(`Error creating device: ${err.error.message}`);
         })
       );
   };
@@ -40,7 +41,7 @@ export class DeviceService {
       .pipe(
         map((response) => response.data),
         catchError((err) => {
-          throw new Error(err);
+          throw new Error(`Error updating device: ${err.error.message}`);
         })
       );
   };
@@ -48,7 +49,7 @@ export class DeviceService {
   deleteDevice = (deviceId: string | number): Observable<void> => {
     return this.http.delete<void>(`${this.apiUrl}/devices/${deviceId}`).pipe(
       catchError((err) => {
-        throw new Error(err);
+        throw new Error(`Error deleting device: ${err.error.message}`);
       })
     );
   };

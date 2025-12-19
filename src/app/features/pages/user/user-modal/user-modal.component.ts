@@ -1,4 +1,11 @@
-import { Component, inject, input, output, signal } from '@angular/core';
+import {
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { User } from '../../../../core/models/models';
 import { CommonModule } from '@angular/common';
 import {
@@ -46,6 +53,9 @@ export class UserModalComponent {
 
   constructor() {
     this.initiateForm();
+    effect(() => {
+      console.log('user', this.userDataInput());
+    });
   }
 
   roles = signal([
@@ -69,7 +79,6 @@ export class UserModalComponent {
       email: ['', [Validators.required, Validators.email]],
       phoneNumber: ['', Validators.minLength(8)],
       role: ['', Validators.required],
-      isActive: [true, Validators.required],
     });
   };
 
@@ -94,7 +103,6 @@ export class UserModalComponent {
   onSubmit = () => {
     if (this.userForm.invalid) return;
     const userPayload: User = this.userForm.getRawValue();
-    console.log('raw', userPayload);
 
     this.loading.set(true);
     this.userDataInput()
@@ -121,15 +129,23 @@ export class UserModalComponent {
         error: (error) => {
           this.mutationStatus.emit({
             status: false,
-            detail: `Error creating user: ${error.message}`,
+            detail: `${error}`,
           });
         },
       });
   };
 
   updateUser = (user: User) => {
+    const updateUserPayload: Partial<User> = {
+      name: user.name,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+    };
+
+    console.log("saa", updateUserPayload);
+    
     this.userService
-      .updateUser(this.userDataInput()!.id, user)
+      .updateUser(this.userDataInput()!.id, updateUserPayload)
       .pipe(
         finalize(() => {
           this.loading.set(false);
@@ -146,7 +162,7 @@ export class UserModalComponent {
         error: (error) => {
           this.mutationStatus.emit({
             status: false,
-            detail: `Error creating user`,
+            detail: error,
           });
         },
       });

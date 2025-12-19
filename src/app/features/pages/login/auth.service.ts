@@ -36,6 +36,29 @@ export class AuthService {
     effect(() => {});
   }
 
+  set jwtToken(token: string) {
+    sessionStorage.setItem(this.SESSIONKEY, token);
+  }
+
+  get jwtToken(): string {
+    return sessionStorage.getItem(this.SESSIONKEY) || '';
+  }
+
+  set jwtUser(user: User) {
+    sessionStorage.setItem(this.USERKEY, JSON.stringify(user));
+  }
+
+  get jwtUser(): User | null {
+    const userData = sessionStorage.getItem(this.USERKEY);
+    return userData ? JSON.parse(userData) : null;
+  }
+
+  hasRole = (role: string): boolean => {
+    const currentRole = this.currentUser()?.role;
+
+    return currentRole ? currentRole === role : false;
+  };
+
   login = (email: string, password: string) => {
     return this.http
       .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
@@ -56,23 +79,6 @@ export class AuthService {
         })
       );
   };
-
-  set jwtToken(token: string) {
-    sessionStorage.setItem(this.SESSIONKEY, token);
-  }
-
-  get jwtToken(): string {
-    return sessionStorage.getItem(this.SESSIONKEY) || '';
-  }
-
-  set jwtUser(user: User) {
-    sessionStorage.setItem(this.USERKEY, JSON.stringify(user));
-  }
-
-  get jwtUser(): User | null {
-    const userData = sessionStorage.getItem(this.USERKEY);
-    return userData ? JSON.parse(userData) : null;
-  }
 
   restoreSession() {
     const token = this.jwtToken;
