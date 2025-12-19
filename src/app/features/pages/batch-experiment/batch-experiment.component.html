@@ -6,6 +6,7 @@
       </div>
 
       <div>
+        @if (checkPermsission('create')) {
         <button
           (click)="editBatchExperiment(null)"
           pButton
@@ -13,8 +14,8 @@
           label="Add Batch"
           icon="pi pi-plus"
           class="mb-4"
-          [disabled]="!checkPermsission('create')"
         ></button>
+        }
       </div>
     </div>
     <div
@@ -100,6 +101,7 @@
               class="p-button-text"
               icon="pi pi-pencil"
             ></button>
+            @if (checkPermsission('delete')) {
             <button
               (click)="deleteBatchExperiment(experiment.id)"
               pButton
@@ -107,8 +109,8 @@
               class="p-button-text"
               severity="danger"
               icon="pi pi-trash"
-              [disabled]="!checkPermsission('delete')"
             ></button>
+            }
           </td>
         </tr>
       </ng-template>

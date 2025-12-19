@@ -102,7 +102,7 @@ export class AuthService {
           token: null,
         });
         sessionStorage.removeItem(this.SESSIONKEY);
-        this.router.navigate(['/login']);
+        window.location.href = '/login';
       })
     );
   };

@@ -51,12 +51,13 @@
     } }
   </div>
 
+  @if (!readonly()) {
   <button
     pButton
     type="submit"
     label="Submit"
     [disabled]="deviceForm.invalid"
     [loading]="loading()"
-    [disabled]="readonly()"
   ></button>
+  }
 </form>
