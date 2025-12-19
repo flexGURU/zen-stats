@@ -73,6 +73,7 @@ export class BatchExperimentModalComponent {
 
   constructor() {
     this.initializeForm();
+    this.analyticalTests.disable();
     effect(() => {
       if (this.readonly()) {
         this.experimentForm.disable();

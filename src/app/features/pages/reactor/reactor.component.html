@@ -16,6 +16,7 @@
   <div>
     <div class="flex justify-between">
       <h1 class="text-3xl font-bold mb-4">Reactors</h1>
+      @if (checkPermission('create')) {
       <button
         (click)="displayModal.set(true)"
         pButton
@@ -23,8 +24,8 @@
         label="Add Reactor"
         icon="pi pi-plus"
         class="mb-4"
-        [disabled]="!checkPermission('create')"
       ></button>
+      }
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
       <div>
@@ -139,6 +140,7 @@
                 class="p-button-text p-button-sm"
                 (click)="editReactor(reactor)"
               ></button>
+              @if(checkPermission('delete')){
               <button
                 pButton
                 type="button"
@@ -146,8 +148,8 @@
                 class="p-button-text p-button-sm"
                 (click)="deleteReactor(reactor.id)"
                 severity="danger"
-                [disabled]="!checkPermission('delete')"
               ></button>
+              }
             </td>
           </tr>
         </ng-template>

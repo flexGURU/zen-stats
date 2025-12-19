@@ -106,12 +106,13 @@
     }
   </div>
 
+  @if (!readonly()) {
   <button
     pButton
     type="submit"
     label="Submit"
     [disabled]="reactorForm.invalid"
     [loading]="loading()"
-    [disabled]="readonly()"
   ></button>
+  }
 </form>
