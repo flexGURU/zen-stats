@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Edwin9301/Zen/backend/pkg"
@@ -39,7 +40,7 @@ func (s *Server) generateReadingReportHandler(ctx *gin.Context) {
 	}
 
 	ctx.Header("Content-Description", "File Transfer")
-	ctx.Header("Content-Disposition", "attachment; filename=readings_report.xlsx")
+	ctx.Header("Content-Disposition", fmt.Sprintf("attachment; filename=readings_report%s-%s.xlsx", req.StartDate, req.EndDate))
 	ctx.Header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 	ctx.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", excelData)
 }

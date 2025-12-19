@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/Edwin9301/Zen/backend/internal/repository"
@@ -16,6 +14,7 @@ type createUserReq struct {
 	Role        string `json:"role" binding:"required,oneof=admin user"`
 	IsActive    bool   `json:"isActive"`
 	PhoneNumber string `json:"phoneNumber"`
+	Password    string `json:"password" binding:"required"`
 }
 
 func (s *Server) createUser(ctx *gin.Context) {
@@ -34,16 +33,16 @@ func (s *Server) createUser(ctx *gin.Context) {
 		PhoneNumber: req.PhoneNumber,
 	}
 
-	randomPassword, err := pkg.GenerateRandomPassword(6)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(pkg.Errorf(pkg.INTERNAL_ERROR, "failed to generate random password: %v", err)))
+	// randomPassword, err := pkg.GenerateRandomPassword(6)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, errorResponse(pkg.Errorf(pkg.INTERNAL_ERROR, "failed to generate random password: %v", err)))
 
-		return
-	}
+	// 	return
+	// }
 
-	log.Println("Generated password for new user:", randomPassword)
+	// log.Println("Generated password for new user:", randomPassword)
 
-	hashedPassword, err := pkg.GenerateHashPassword(randomPassword, s.config.PASSWORD_COST)
+	hashedPassword, err := pkg.GenerateHashPassword(req.Password, s.config.PASSWORD_COST)
 	if err != nil {
 		ctx.JSON(pkg.ErrorToStatusCode(err), errorResponse(err))
 
@@ -57,28 +56,28 @@ func (s *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, err := s.tokenMaker.CreateToken(createdUser.ID, createdUser.Name, createdUser.Email, createdUser.Role, s.config.REFRESH_TOKEN_DURATION)
-	if err != nil {
-		ctx.JSON(pkg.ErrorToStatusCode(err), errorResponse(err))
+	// refreshToken, err := s.tokenMaker.CreateToken(createdUser.ID, createdUser.Name, createdUser.Email, createdUser.Role, s.config.REFRESH_TOKEN_DURATION)
+	// if err != nil {
+	// 	ctx.JSON(pkg.ErrorToStatusCode(err), errorResponse(err))
 
-		return
-	}
+	// 	return
+	// }
 
-	emailBody, err := pkg.GenerateText("welcome_email", pkg.InviteUserTemplate, map[string]any{
-		"FullName":   createdUser.Name,
-		"Email":      createdUser.Email,
-		"InviteLink": fmt.Sprintf("%s/reset-password?token=%s", s.config.FRONTEND_ACTIVE_URL, refreshToken),
-	})
-	if err != nil {
-		log.Printf("failed to generate welcome email for user %s: %v", createdUser.Email, err)
-		return
-	}
+	// emailBody, err := pkg.GenerateText("welcome_email", pkg.InviteUserTemplate, map[string]any{
+	// 	"FullName":   createdUser.Name,
+	// 	"Email":      createdUser.Email,
+	// 	"InviteLink": fmt.Sprintf("%s/reset-password?token=%s", s.config.FRONTEND_ACTIVE_URL, refreshToken),
+	// })
+	// if err != nil {
+	// 	log.Printf("failed to generate welcome email for user %s: %v", createdUser.Email, err)
+	// 	return
+	// }
 
-	go func(email string, emailBody string) {
-		if err := s.email.SendMail("Welcome Message", emailBody, "text/html", []string{email}, nil, nil, nil, nil); err != nil {
-			log.Printf("failed to send password reset email to %s: %v", email, err)
-		}
-	}(createdUser.Email, emailBody)
+	// go func(email string, emailBody string) {
+	// 	if err := s.email.SendMail("Welcome Message", emailBody, "text/html", []string{email}, nil, nil, nil, nil); err != nil {
+	// 		log.Printf("failed to send password reset email to %s: %v", email, err)
+	// 	}
+	// }(createdUser.Email, emailBody)
 
 	ctx.JSON(http.StatusCreated, gin.H{"data": createdUser})
 }
