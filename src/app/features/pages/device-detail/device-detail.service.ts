@@ -1,9 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../../environments/environment.development';
-import { catchError, Observable, map, tap } from 'rxjs';
+import { catchError, Observable, map } from 'rxjs';
 import {
   Device,
-  DeviceDetail,
   DeviceSummary,
 } from '../../../core/models/models';
 import { HttpClient } from '@angular/common/http';

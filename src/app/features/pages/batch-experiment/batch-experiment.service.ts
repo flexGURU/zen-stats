@@ -1,5 +1,4 @@
 import { computed, effect, inject, Injectable, signal } from '@angular/core';
-import { environment } from '../../../../environments/environment.development';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, Observable, tap } from 'rxjs';
 import { BatchExperiment, PaginationMeta } from '../../../core/models/models';
