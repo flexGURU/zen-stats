@@ -15,7 +15,8 @@ export class UserService {
     return this.http.get<{ data: User[] }>(`${this.apiUrl}/users`).pipe(
       map((response) => response.data),
       catchError((error) => {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users:', error); 
+        
         throw new Error(`Error fetching users: ${error.error.message}`);
       })
     );
