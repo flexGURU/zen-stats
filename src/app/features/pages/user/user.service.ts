@@ -8,7 +8,7 @@ import { User } from '../../../core/models/models';
   providedIn: 'root',
 })
 export class UserService {
-  private readonly apiUrl = environment.APIURL;
+  private apiUrl = import.meta.env.NG_APP_APIURL;
 
   private http = inject(HttpClient);
 

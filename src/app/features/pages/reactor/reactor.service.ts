@@ -8,7 +8,7 @@ import { Reactor } from '../../../core/models/models';
   providedIn: 'root',
 })
 export class ReactorService {
-  private readonly apiUrl = environment.APIURL;
+  private apiUrl = import.meta.env.NG_APP_APIURL;
   private http = inject(HttpClient);
 
   search = signal('');

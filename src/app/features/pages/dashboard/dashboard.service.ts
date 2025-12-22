@@ -8,7 +8,7 @@ import { Device } from '../../../core/models/models';
   providedIn: 'root',
 })
 export class DashboardService {
-  private readonly apiUrl = environment.APIURL;
+  private readonly apiUrl = import.meta.env.NG_APP_APIURL;
 
   private http = inject(HttpClient);
 
@@ -23,5 +23,4 @@ export class DashboardService {
         })
       );
   };
-  
 }

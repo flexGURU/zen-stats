@@ -17,7 +17,7 @@ type AuthState = {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private readonly apiUrl = environment.APIURL;
+  private apiUrl = import.meta.env.NG_APP_APIURL;
   private readonly SESSIONKEY = 'zen_session';
   private readonly USERKEY = 'zen_user';
 
